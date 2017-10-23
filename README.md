@@ -10,4 +10,6 @@ big markdown file. The Python file includes a comment with an example `pandoc`
 command to build the big document into a nice PDF, which is also included
 [here](./out.pdf).
 
-The companion starts at [0.md](./md). Enjoy yourself!
+For those on GitHub, I highly recommend reading [the PDF](./out.pdf). GitHub
+doesn't render math in its markdown, nor will the files be sorted in a readable
+order.
