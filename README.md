@@ -7,4 +7,7 @@ _Machine Learning: An Algorithmic Perspective_.
 The companion is broken up into several markdown files, labeled by section
 numbers. There is also a Python file to concatenate them all together into one
 big markdown file. The Python file includes a comment with an example `pandoc`
-command to build the big document into a nice PDF.
+command to build the big document into a nice PDF, which is also included
+[here](./out.pdf).
+
+The companion starts at [0.md](./md). Enjoy yourself!
