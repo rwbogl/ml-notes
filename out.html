@@ -1,0 +1,1183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="R. Dougherty-Bliss" />
+  <title>A Companion of Questionable Quality to Machine Learning: An Algorithmic Perspective</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML-full" type="text/javascript"></script>
+</head>
+<body>
+<div id="header">
+<h1 class="title">A Companion of Questionable Quality to <em>Machine Learning: An Algorithmic Perspective</em></h1>
+<h2 class="author">R. Dougherty-Bliss</h2>
+<h3 class="date">CSC-490, 2016FA</h3>
+</div>
+<div id="TOC">
+<ul>
+<li><a href="#companion-introduction">Companion Introduction</a></li>
+<li><a href="#introduction">Introduction</a><ul>
+<li><a href="#complexity-of-learning-algorithms">Complexity of Learning Algorithms</a></li>
+<li><a href="#supervised-learning">Supervised Learning</a></li>
+<li><a href="#examples-of-noise">Examples of Noise</a></li>
+</ul></li>
+<li><a href="#preliminaries">Preliminaries</a><ul>
+<li><a href="#distance-formula">Distance Formula</a></li>
+<li><a href="#the-curse-of-dimensionality">The Curse of Dimensionality</a></li>
+<li><a href="#accuracy-metrics">Accuracy Metrics</a></li>
+<li><a href="#training-testing-and-validation-sets">Training, Testing, and Validation Sets</a><ul>
+<li><a href="#k-fold-cross-validation"><span class="math inline">\(K\)</span>-fold Cross-Validation</a></li>
+</ul></li>
+<li><a href="#accuracy-metrics-1">Accuracy Metrics</a></li>
+<li><a href="#the-receiver-operator-characteristic-curve">The Receiver Operator Characteristic Curve</a></li>
+<li><a href="#naïve-bayes-classifier">Naïve Bayes Classifier</a></li>
+</ul></li>
+<li><a href="#neurons-and-neural-networks">Neurons and Neural Networks</a><ul>
+<li><a href="#neurons">Neurons</a></li>
+<li><a href="#perceptrons">Perceptrons</a><ul>
+<li><a href="#introduction-1">Introduction</a></li>
+<li><a href="#perceptron-convergence-theorem">Perceptron Convergence Theorem</a></li>
+<li><a href="#convergence-time-estimate">Convergence Time Estimate</a></li>
+<li><a href="#perceptron-linear-regression">Perceptron Linear Regression</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#mlp-in-practice">MLP in Practice</a><ul>
+<li><a href="#when-to-stop">When to Stop?</a></li>
+<li><a href="#probably-approximately-correct-learning">Probably Approximately Correct Learning</a></li>
+<li><a href="#universal-approximation-theorem">Universal Approximation Theorem</a></li>
+<li><a href="#of-n">1-of-<span class="math inline">\(N\)</span></a></li>
+<li><a href="#compression">Compression</a></li>
+<li><a href="#recipe-for-mlp">Recipe for MLP</a></li>
+</ul></li>
+<li><a href="#dimensionality-reduction">Dimensionality Reduction</a><ul>
+<li><a href="#linear-discriminant-analysis-lda">Linear Discriminant Analysis (LDA)</a></li>
+<li><a href="#principal-components-analysis-pca">Principal Components Analysis (PCA)</a></li>
+<li><a href="#factor-analysis">Factor Analysis</a></li>
+<li><a href="#locally-linear-embedding">Locally Linear Embedding</a></li>
+</ul></li>
+<li><a href="#probabilistic-learning">Probabilistic Learning</a><ul>
+<li><a href="#gaussian-mixture-models">Gaussian Mixture Models</a></li>
+<li><a href="#information-criteria">Information Criteria</a></li>
+<li><a href="#em-algorithm">EM Algorithm</a></li>
+</ul></li>
+<li><a href="#support-vector-machines">Support Vector Machines</a><ul>
+<li><a href="#perceptrons-and-their-limitations">Perceptrons and their Limitations</a></li>
+<li><a href="#enter-support-vector-machines">Enter: Support Vector Machines</a><ul>
+<li><a href="#finding-the-maximum-margin-classifier">Finding the Maximum Margin Classifier</a></li>
+<li><a href="#questions-and-clarifications">Questions and Clarifications</a></li>
+</ul></li>
+<li><a href="#kernels">Kernels</a><ul>
+<li><a href="#transformations">Transformations</a></li>
+<li><a href="#kernels-and-the-kernel-trick">Kernels and the Kernel Trick</a></li>
+<li><a href="#kernel-clarification">Kernel Clarification</a></li>
+</ul></li>
+<li><a href="#the-karush--kuhn--tucker-method">The Karush--Kuhn--Tucker Method</a><ul>
+<li><a href="#the-lagrangian">The Lagrangian</a></li>
+<li><a href="#kkt-extending-the-lagrangian-with-inequalities">KKT: Extending the Lagrangian with Inequalities</a></li>
+</ul></li>
+<li><a href="#svm-algorithm-outline">SVM Algorithm Outline</a></li>
+</ul></li>
+<li><a href="#optimization-and-search">Optimization and Search</a><ul>
+<li><a href="#line-searches-and-gradient-descent">Line Searches and Gradient Descent</a></li>
+<li><a href="#conjugate-gradients">Conjugate Gradients</a></li>
+</ul></li>
+<li><a href="#the-levenberg-marquardt-algorithm">The Levenberg-Marquardt Algorithm</a><ul>
+<li><a href="#search-direction">Search Direction</a></li>
+<li><a href="#algorithmic-sketch">Algorithmic Sketch</a></li>
+</ul></li>
+<li><a href="#genetic-algorithms">Genetic Algorithms</a><ul>
+<li><a href="#general-description">General Description</a></li>
+<li><a href="#the-knapsack-problem">The Knapsack Problem</a></li>
+</ul></li>
+<li><a href="#reinforcement-learning">Reinforcement Learning</a><ul>
+<li><a href="#action-selection">Action Selection</a></li>
+<li><a href="#values">Values</a></li>
+<li><a href="#the-algorithms">The Algorithms</a></li>
+</ul></li>
+<li><a href="#learning-with-trees">Learning with Trees</a><ul>
+<li><a href="#id3-example-setup">ID3 Example Setup</a></li>
+</ul></li>
+<li><a href="#unsupervised-learning">Unsupervised Learning</a><ul>
+<li><a href="#the-k-means-algorithm">The <span class="math inline">\(K\)</span>-Means Algorithm</a><ul>
+<li><a href="#the-k-means-algorithm-as-a-neural-network">The <span class="math inline">\(K\)</span>-Means Algorithm as a Neural Network</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#random-number-sampling">Random Number Sampling</a><ul>
+<li><a href="#the-box-muller-scheme">The Box-Muller Scheme</a></li>
+<li><a href="#proposal-distributions">Proposal Distributions</a></li>
+</ul></li>
+<li><a href="#markov-chain-monte-carlo-mcmc">Markov Chain Monte Carlo (MCMC)</a><ul>
+<li><a href="#markov-chains">Markov Chains</a></li>
+<li><a href="#markov-chains-and-sampling">Markov Chains and Sampling</a></li>
+</ul></li>
+<li><a href="#gaussian-process-regression">Gaussian Process Regression</a><ul>
+<li><a href="#gaussian-processes">Gaussian Processes</a></li>
+<li><a href="#performing-regression">Performing Regression</a></li>
+<li><a href="#algorithm-sketch">Algorithm Sketch</a></li>
+</ul></li>
+<li><a href="#bayesian-networks">Bayesian Networks</a><ul>
+<li><a href="#computational-examples">Computational Examples</a></li>
+<li><a href="#score-based-approach">Score-Based Approach</a><ul>
+<li><a href="#minimum-description-length-mdl">Minimum Description Length (MDL)</a></li>
+</ul></li>
+<li><a href="#independence-tests">Independence Tests</a></li>
+<li><a href="#pc-algorithm">PC Algorithm</a></li>
+<li><a href="#hidden-markov-models">Hidden Markov Models</a><ul>
+<li><a href="#forward-algorithm">Forward Algorithm</a></li>
+<li><a href="#baum-welch-foward-backward-algorithm">Baum-Welch (Foward-Backward) Algorithm</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="companion-introduction">Companion Introduction</h1>
+<p>This document is a partial collection of notes to accompany the second edition of Marsland's textbook <em>Machine Learning: An Algorithmic Perspective</em>. It was written as a part of an honors course in machine learning I took at Oglethorpe University.</p>
+<p>The different sections of this were written with different intentions. Some of them are my notes from the lectures in class, while some of them are notes I prepared for my own &quot;lectures&quot; as a part of the honors class. This gives some variability to each section. Some sections are bullet points recounting the text's material, some offer the viewpoint of a different source, and some could serve as lecture notes. There is a rough chronological ordering to the notes, e.g. Chapter 1 is first, then Chapter 2, etc, but the sections themselves are not currently numbered here.</p>
+<p><em>An Algorithmic Perspective</em> covers a wide array of topics, provides exercises and references for further reading, almost always gives an outline of algorithms and often has implementations available online. There are numerous examples of algorithms being run, and the text <em>usually</em> manages to stay away from complicated formalism for introductions.</p>
+<p>The presentation in the book could be better. There are enough typos that I worried what formulas were typed correctly in the book. At times the writing is verbose, and after pages of text the reader is left wondering what the point was. At times the opposite is true, and the reader is left to puzzle out how a mess of equations applies to the problem at hand. I did a lot of flipping through the book while I read it; both to get to the point of a long-winded section, and to try and find earlier explanations of mathematical topics.</p>
+<p>The mathematics in the book is not pitched at a constant level. As the book continues, the math tends to get more sophisticated, but the author never takes the time to explain it all. That is fair, since this is not a math book. I would say that a good course in linear algebra is a good thing to have to make it through some of the more sophisticated sections. (At the time I wrote these notes, I hadn't had one yet. When explaining the math, I made judgement calls when I had to. Take it with a grain of salt.)</p>
+<p>Finally, the book chooses to not use any machine learning libraries. I do not know if this is good or bad. On the one hand, we see how to build the algorithms from scratch, without too many optimizations. On the other hand, in an actual project, I would opt to use libraries like <code>scikit-learn</code> over the code in the book.</p>
+<p>Hopefully the notes here will help someone else, even if only to frustrate them enough to write an even better companion.</p>
+<h1 id="introduction">Introduction</h1>
+<p>The introduction of Section 1.2 is dense, but contains important points. Machine learning generally tries to emulate the following process:</p>
+<ul>
+<li><em>Remembering</em> past examples.</li>
+<li><em>Adapting</em> memory of past examples for the present.</li>
+<li><em>Generalizing</em> knowledge to handle new examples.</li>
+</ul>
+<p>The four main types of learning algorithms are summarized in a list in Section 1.3, reproduced here:</p>
+<ul>
+<li><em>Supervised learning</em>, where training inputs have target outputs.</li>
+<li><p><em>Unsupervised learning</em>, where inputs do not have target outputs.</p></li>
+<li><p><em>Reinforcement learning</em>, where an evaluator is told when they are wrong, but not the answer.</p></li>
+<li><p><em>Evolutionary learning</em>, where random solutions are generated to maximize some fitness function.</p></li>
+</ul>
+<p>These classifications are slightly arbitrary. Reinforcement learning and the fitness function in evolutionary learning are both very much like supervised learning.</p>
+<p>A rough sketch of the overall learning process is given in Section 1.5, reproduced here:</p>
+<ol style="list-style-type: decimal">
+<li>Data Collection and Preparation</li>
+<li>Feature Selection</li>
+<li>Algorithm Choice</li>
+<li>Parameter and Model Selection</li>
+<li>Training</li>
+<li>Evaluation</li>
+</ol>
+<p>No learning takes place until the Training step. The steps before it are entirely focused on finding data and tailoring the learning algorithm choice to the problem at hand.</p>
+<p>Section 1.6 (&quot;A Note on Programming&quot;) could be important. Random programs aren't reproducible, so the <code>np.random.seed()</code> call is necessary for debugging specific cases. Aside from this method of debugging, reference programs are very useful — mostly to see where we went wrong in our implementation.</p>
+<h2 id="complexity-of-learning-algorithms">Complexity of Learning Algorithms</h2>
+<p>The reason for machine learning existing is because data sets are too large for humans to analyze. The inputs that learning algorithms receive will be much larger than most algorithms, so time complexity will be very important. For a data set of ten-thousand, the difference between <span class="math inline">\(O(n^2)\)</span> and <span class="math inline">\(O(n^3)\)</span> is huge.</p>
+<p>Learning algorithms can be roughly split into two components:</p>
+<ul>
+<li><em>Learning</em> (looking at training data); and</li>
+<li><em>Application</em> (applying the trained algorithm to data).</li>
+</ul>
+<p>The complexity of a learning algorithm can be measured in both of these parts.</p>
+<p>Given <span class="math inline">\(n\)</span> training inputs, the complexity of learning will be <em>at least</em> <span class="math inline">\(O(n)\)</span>; we have to at least look at each input once. Generally, this process is expected to have more complexity and take longer than application.</p>
+<p>Given <span class="math inline">\(n\)</span> inputs, we would like for application to be <em>no more</em> complex than, say, <span class="math inline">\(O(n^2)\)</span>; any more and we risk taking too long to be useful.</p>
+<h2 id="supervised-learning">Supervised Learning</h2>
+<p>The book makes a point to introduce supervised learning here, but there is really only one point to make.</p>
+<p>In supervised learning, a sequence of points <span class="math inline">\((x_i, t_i)\)</span> is given. For each <span class="math inline">\(x_i\)</span>, the element <span class="math inline">\(t_i\)</span> is the <em>correct</em> answer to classifying <span class="math inline">\(x_i\)</span>. The goal is for the algorithm to learn from these pairs and be able to correctly match each <span class="math inline">\(x_i\)</span> with <span class="math inline">\(t_i\)</span>.</p>
+<p>Usually, <span class="math inline">\((x_i)\)</span> is a sample of the set of all possible inputs, so the algorithm should also generalize its learning to inputs <em>not</em> in <span class="math inline">\((x_i)\)</span>.</p>
+<p>The regression example in 1.4.1 is a nice way to reframe what most people know about regression. Given a sequence of points <span class="math inline">\((x_i, y_i)\)</span>, the sequence <span class="math inline">\((x_i)\)</span> is the sequence of <span class="math inline">\(x\)</span>-coordinates, and <span class="math inline">\((t_i)\)</span> is the sequence of <span class="math inline">\(y\)</span>-coordinates.</p>
+<p>The classification example in 1.4.2 is basically regression but with a discrete range for the function.</p>
+<h2 id="examples-of-noise">Examples of Noise</h2>
+<p>The <em>noise</em> in a data set refers to the random fluctuations that are not relevant for classification or prediction. As a fabricated example, a collection of identical thermometers next to each other may give slightly different readings due to the noise of the environment around them.</p>
+For a more concrete example, suppose that we are using supervised learning, and we have the following two training points:
+<span class="math display">\[\begin{align*}
+    ((0, 0, 0), 1) \\
+    ((0, 0, 0), 0)
+\end{align*}\]</span>
+<p>After training, if the input <span class="math inline">\((0, 0, 0)\)</span> is seen, there is no reliable way to determine if the output should be <span class="math inline">\(0\)</span> or <span class="math inline">\(1\)</span>. This is an extreme example of noise, where one input appears to have two different targets associated with it.</p>
+As a more realistic example, consider the following training points:
+<span class="math display">\[\begin{align*}
+    ((0, 0, 0), 0) \\
+    ((1, 1, 1), 1)
+\end{align*}\]</span>
+<p>If we then see the input <span class="math inline">\((0, 0, 1)\)</span>, it is possible that the single <span class="math inline">\(1\)</span> is due to random noise. Hence it is difficult to decide if the output should be <span class="math inline">\(0\)</span> or some intermediate value.</p>
+<h1 id="preliminaries">Preliminaries</h1>
+<p>The terminology introduced in 2.1 is very biased towards supervised learning, and neural networks in particular. Input and output vectors (<span class="math inline">\(\vec{x}\)</span> and <span class="math inline">\(\vec{y}\)</span>) are pretty general; but weights and activation functions (<span class="math inline">\(\vec{W}\)</span> and <span class="math inline">\(g(\cdot)\)</span>) are mostly associated with neural networks, and targets (<span class="math inline">\(\vec{t}\)</span>) are only for supervised learning.</p>
+<h2 id="distance-formula">Distance Formula</h2>
+<p>The distance formula is introduced here in the context of neural networks. The rough idea is to treat weights of neurons as coordinates in space, and have the neurons fire if they are &quot;close enough&quot; to an input vector. The distance function can be used generally to measure how far away inputs are from some target.</p>
+<p>This concept doesn't seem to be used in the chapter, so it feels a little out of place.</p>
+<h2 id="the-curse-of-dimensionality">The Curse of Dimensionality</h2>
+<p>The point of the hypersphere argument is unclear. In summary, as the number of dimensions increases, we will need much more data to train on. This is because the data will, in general, tend to be more spread out.</p>
+<p>To explain the hypersphere argument, construct a unit box in an arbitrary number of dimensions. Think of the hypersphere as our target; that is, if we pick a random point from the unit box, we want it to be in the sphere. If we are picking the points randomly, the probability of a point being in the sphere is <span class="math inline">\(V(S) / V(B)\)</span>, where <span class="math inline">\(V(S)\)</span> and <span class="math inline">\(V(B)\)</span> are the volumes of the sphere and box, respectively.</p>
+<p>As the number of dimensions increases, the volume of the sphere does not grow as quickly as the volume of the cube, so the probability of picking a point in the sphere at random decreases simply because we added more dimensions.</p>
+<p>This idea will apply to our learning algorithms. Our classifiers will be less accurate as the number of dimensions in our inputs increases, just because of the greater spread. Thus we will need much more data as the number of dimensions we use increases.</p>
+<h2 id="accuracy-metrics">Accuracy Metrics</h2>
+<p>Accuracy metrics are useful to compare different methods of learning to each other.</p>
+<p>Leave out some, crossfold validation (<span class="math inline">\(K\)</span>-Fold Cross Validation): Split data into different chunks, and assign some chunks to be training, some to be validation, and some to be testing. For every possible combination of assignments, train a new model on the created data set, then take the best model. (There was a very pretty picture.)</p>
+<h2 id="training-testing-and-validation-sets">Training, Testing, and Validation Sets</h2>
+<p>During learning, we are always given a data set of examples. In supervised learning, we will partition the data into three different sets:</p>
+<ul>
+<li><em>Training</em>: Used to train a classifier.</li>
+<li><em>Validation</em>: Used to test the accuracy of a classifier independent of the the classifier has never been trained on, to test for overfitting.</li>
+<li><em>Testing</em>: Used to test the final accuracy of a classifier against data it has never even seen.</li>
+</ul>
+<p>It is important that these sets be disjoint. The point of the validation set is to test both for accuracy and overfitting. If points from the validation set are in the training set, then the classifier may overfit to the validation set, destroying its intended metric. The same point can be made for the testing set.</p>
+<p>It is also important that these sets be randomly chosen. If there is some sort of bias, then the classifier could inherit this bias. For example, suppose that a data set is sorted low-to-high for some feature. If we just take the first 60% of the data to be training, 20% to be validation, and 20% to be testing, then the classifier would only be trainined on the lower-end values of this feature.</p>
+<p>Discussion questions:</p>
+<ul>
+<li><p>Why do we have training sets and test sets? (We need to test for generalization and overfitting.)</p></li>
+<li><p>What purpose does the validation set serve? (It offers an intermediate overfitting metric before testing.)</p></li>
+<li><p>When is the test set used? (Only after all training is complete.)</p></li>
+<li><p>Why is overfitting bad? (We might not be able to apply our algorithm to data outside of the training set.)</p></li>
+</ul>
+<h3 id="k-fold-cross-validation"><span class="math inline">\(K\)</span>-fold Cross-Validation</h3>
+<p>When we have lots of data, partitioning the data into training, validation, and testing sets is fairly simple. If we do not have lots of data, we can use the method of <span class="math inline">\(K\)</span>-fold cross validation.</p>
+<p>Briefly:</p>
+<ul>
+<li>Randomly partition the data into <span class="math inline">\(K\)</span> subsets.</li>
+<li>Choose one subset for validation, another for testing, and combine the rest to be training.</li>
+<li>Train a classifier on these given sets.</li>
+<li>Repeat with a new classifier for all possible random partitions, then take the one with the best testing accuracy.</li>
+</ul>
+<h2 id="accuracy-metrics-1">Accuracy Metrics</h2>
+<p>Accuracy is simply the ratio of the number of correct classifications to the total number of inputs: the estimated probability that we can correctly classify inputs.</p>
+<ul>
+<li><p><em>Sensitivity</em> is the ratio correct positives over total positives present: the estimated probability that we can correctly classify inputs given that they are positive; cf. <span class="math inline">\(P(\)</span>Classified True <span class="math inline">\(\mid\)</span> True<span class="math inline">\()\)</span>. <em>Specificity</em> is analogous, but for negatives; cf. <span class="math inline">\(P(\)</span>Classified False <span class="math inline">\(\mid\)</span> False<span class="math inline">\()\)</span>.</p></li>
+<li><p><em>Precision</em> is the ratio of correct positives over all classified positives: the estimated probability that an input was correctly classified positive given that we did classify it positive; cf. <span class="math inline">\(P(\)</span>True <span class="math inline">\(\mid\)</span> Classified True<span class="math inline">\()\)</span>. Sort of the converse of sensitivity<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p></li>
+<li><p>The <em><span class="math inline">\(F_1\)</span> metric</em> is the ratio of correct positives over the sum of correct positives and average number of misclassifications; it is one if and only if there are no misclassifications, and strictly less than one otherwise.</p></li>
+</ul>
+<p>The text mentions the implicit assumption of a balanced data sets for these metrics. This assumption comes into play because many of these metrics will be misleading if a large majority of data is negative or positive. For example, consider a data set that is a snapshot of infections in a population of a rare disease. Most inputs will be negatives, so models that always classify negative will have specificity of one, but will not have actually learned how to detect the disease.</p>
+<h2 id="the-receiver-operator-characteristic-curve">The Receiver Operator Characteristic Curve</h2>
+<p>The ROC curve is mostly well explained. A curve that looks as smooth as the ones in the book will require either a lot of points, or some kind of regression curve.</p>
+<h2 id="naïve-bayes-classifier">Naïve Bayes Classifier</h2>
+<p>Given the feature vector <span class="math inline">\(\vec{X_j}\)</span>, to compute <span class="math inline">\(P(C_i \mid \vec{X_j})\)</span>, we need to compute <span class="math inline">\(P(X_j^1 = a_1,\ X_j^2 = a_2,\ \dots,\ X_j^n = a_n \mid C_i)\)</span>. We may not be able to find a point such that <span class="math inline">\(X_j^k = a_k\)</span> holds for every valid <span class="math inline">\(k\)</span>. This is an issue, because then the joint probability is impossible, and so <span class="math inline">\(P(\vec{X_j} = \vec{a} \mid C_i) = 0\)</span>.</p>
+<p>To make this easier, we make the simplifying assumption that the components <span class="math inline">\(X_j^k = a_k\)</span> are independent from each other. Then, <span class="math inline">\(P(X_j^1 = a_1,\ X_j^2 = a_2,\ \dots,\ X_j^n = a_n \mid C_i) = P(X_j^1 = a_1 \mid C_i) P(X_j^i = a_2 \mid C_i) \cdots P(X_j^n = a_n \mid a_n)\)</span>. This lets us find examples that satisfy each value separately, instead of looking for examples that satisfy <em>every</em> value restriction.</p>
+<h1 id="neurons-and-neural-networks">Neurons and Neural Networks</h1>
+<h2 id="neurons">Neurons</h2>
+<ul>
+<li><p>Hebb's Rule postulates that the relationship between neurons is determined by how often they fire simultaneously. This allows us to formulate our model of how neurons learn.</p></li>
+<li><p>Given MCP neurons, we can only modify the weights and the threshold. These are updated using the perceptron algorithm.</p></li>
+</ul>
+<p>A positive weight from node A to node B indicates that positive inputs in A generally imply B. A negative weight from A to B indicates that positive inputs in A generally imply not B.</p>
+<h2 id="perceptrons">Perceptrons</h2>
+<h3 id="introduction-1">Introduction</h3>
+<ul>
+<li>Perceptrons are networks of MCP neurons, where there is a layer of inputs and a layer of MCP neurons. Every input is connected to every neuron in the network.</li>
+</ul>
+<p>Weights are updated by punishing the weights that do poorly (mismatch the target).</p>
+<ul>
+<li>Find nodes where <span class="math inline">\(y_k \neq t_k\)</span>, and consider the positive weights.</li>
+<li>If <span class="math inline">\(y_k &gt; t_k\)</span>, then positive inputs are contributing too much.</li>
+<li>If <span class="math inline">\(y_k &lt; t_k\)</span>, then positive inputs are not contributing enough.</li>
+</ul>
+<p>This method only works if we have a positive input. If we have a negative input, then we need to do the opposite. For example, if <span class="math inline">\(y_k &gt; t_k\)</span> and <span class="math inline">\(x_k\)</span> was negative, then the weight did not add enough value to <span class="math inline">\(x_k\)</span> to stop the firing, so the weight must be increased. This rule is succinctly described by <span class="math display">\[\Delta w_{ik} = -(y_k - t_k) x_i,\]</span> where <span class="math inline">\(\Delta w_{ik}\)</span> is the amount of change to weight <span class="math inline">\(w_{ik}\)</span>, i.e. <span class="math inline">\(w^{k + 1}_{ik} = w^k_{ik} + \Delta w^{ik}_{ik}\)</span>. The following properties are easy to verify:</p>
+<ul>
+<li>If <span class="math inline">\(y_k &gt; t_k\)</span> (misfire):
+<ul>
+<li>If <span class="math inline">\(x_k &gt; 0\)</span>, then the weight decreases. (<span class="math inline">\(w_k x_k\)</span> added too much.)</li>
+<li>If <span class="math inline">\(x_k &lt; 0\)</span>, then the weight increases. (<span class="math inline">\(w_k x_k\)</span> did not take away enough.)</li>
+</ul></li>
+<li>If <span class="math inline">\(y_k &lt; t_k\)</span> (should have fired):
+<ul>
+<li>If <span class="math inline">\(x_k &gt; 0\)</span>, then the weight increases. (<span class="math inline">\(w_k x_k\)</span> did not add enough.)</li>
+<li>If <span class="math inline">\(x_k &lt; 0\)</span>, then the weight decreases. (<span class="math inline">\(w_k x_k\)</span> took away too much.)</li>
+</ul></li>
+</ul>
+<p>The only remaining component is the learning rate, <span class="math inline">\(\eta\)</span>. It is essentially like a step size, i.e. how far we should step in the direction of the &quot;correct&quot; descent.</p>
+<h3 id="perceptron-convergence-theorem">Perceptron Convergence Theorem</h3>
+<p>Amazingly, for some datasets, Perceptrons are guaranteed to learn them in finite time. These datasets are called <em>linearly separable</em>, and to talk about them, we need to discuss more about what the Perceptron is actually doing.</p>
+<p>The weights of perceptrons define a <em>decision boundary</em>. If an input falls on one side of the decision boundary, it it classified one way; if it falls on the other side, the other way. This decision boundary is, in general, a hyperplane defined by the equation <span class="math inline">\(\vec{x}\vec{W}^T = 0\)</span>, where <span class="math inline">\(\vec{W}\)</span> is the weight vector for a single perceptron.</p>
+<p>A dataset is called <em>linearly separable</em> if there exists a linear separator that correctly classifies the dataset. More formally, if we can partition the dataset into two disjoint classes <span class="math inline">\(C_1\)</span> and <span class="math inline">\(C_2\)</span>, then the dataset is linearly separable iff there exists some weight vector <span class="math inline">\(\vec{W}\)</span> such that <span class="math inline">\(\vec{x} \vec{W}^T \geq 0\)</span> for all <span class="math inline">\(\vec{x} \in C_1\)</span>, and <span class="math inline">\(\vec{x} \vec{W}^T &lt; 0\)</span> for all <span class="math inline">\(\vec{x} \in C_2\)</span>.</p>
+<p>The Perceptron Convergence Theorem states that, if a dataset is linearly separable, then the Perceptron learning algorithm will find a linear separating weight vector in finite time. That is, the Perceptron will be able to correctly classify inputs based on which side of the boundary they fall on in finite time.</p>
+<h3 id="convergence-time-estimate">Convergence Time Estimate</h3>
+<p>The Perceptron Convergence theorem states that, given a linearly separable dataset, the perceptron will learn a linear separator within <span class="math inline">\(1/\gamma\)</span> updates, where <span class="math inline">\(\gamma\)</span> is defined to be the distance from the linear separator that the perceptron <em>will</em> converge to and the datapoint closest to it.</p>
+<p>As an approximation of <span class="math inline">\(\gamma\)</span>, we can use <span class="math inline">\(d\)</span>, where <span class="math inline">\(d\)</span> is half of the smallest distance between any two points of opposite classes. Then, we define <span class="math inline">\(T&#39; = 1/d^2\)</span>, which is <em>usually</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> less than <span class="math inline">\(T\)</span>. That is, we we create a convergence time estimate <span class="math inline">\(T&#39;\)</span> such that <span class="math inline">\(T &gt; T&#39;\)</span>.</p>
+<h3 id="perceptron-linear-regression">Perceptron Linear Regression</h3>
+<p>Essentially, we use calculus to find the &quot;weight&quot; vector <span class="math inline">\(\vec{\beta}\)</span> that minimizes the sum of squared errors <span class="math display">\[\sum_{k = 0}^N (t_k - y_k)^2 = \sum_{k =
+0}^N (t_k - \sum_{j = 0}^m \beta_j x_j).\]</span></p>
+<p>Perceptrons try to draw lines <em>between</em> data, to classify points. Linear regression tries to draw lines <em>through</em> data, to match the points' class values.</p>
+<h1 id="mlp-in-practice">MLP in Practice</h1>
+<p>Recall that slicing on numpy arrays can be done in multiple dimensions. For example, let <code>x</code> be a numpy matrix. Then:</p>
+<ul>
+<li><code>x[0]</code> returns the first row.</li>
+<li><code>x[0:3, 0]</code> returns the first element of the first three rows.</li>
+<li><code>x[:3, 0]</code> is the same as above.</li>
+<li><code>x[:3, :6]</code> returns the first six elements of the first three rows.</li>
+<li><code>x[:3, -3:]</code> returns the last three elements of the first three rows.</li>
+</ul>
+<h2 id="when-to-stop">When to Stop?</h2>
+<p>The naïve method is to train for <span class="math inline">\(T\)</span> batches, for some constant <span class="math inline">\(T\)</span>. There is no theoretical basis for this. As Dr. Patterson puts it, this method &quot;kinda sucks.&quot;</p>
+<p>The next, slightly less naïve method is to set an accuracy threshold for the training set. This could end in an infinite loop if that accuracy is never reached.</p>
+<p>The more analytic approach is to make use of the validation set. In theory, while the MLP is learning the dataset or function, validation error will be decreasing. As we begin to overfit the data or function, the validation error will begin to increase again. Thus we will try to stop training at a local minimum of the validation error.</p>
+<p>Finding this local minimum can be tricky. The book suggests keeping three previous models during training. If either of the two most recent validation errors has decreased enough from the validation error before themselves, then continue training. We check both so that a minor fluctuation in validation error will not halt training prematurely.</p>
+<h2 id="probably-approximately-correct-learning">Probably Approximately Correct Learning</h2>
+<p>The book says that, given <span class="math inline">\(W\)</span> weights, we should have roughly <span class="math inline">\(10W\)</span> datapoints to train on. Dr. Patterson says that, given <span class="math inline">\(L\)</span> inputs, we should have roughly <span class="math inline">\(2^L\)</span> datapoints.</p>
+<p>Neither of these have much theoretical grounding -- they are just practical rules of thumb. The subset of machine learning called <em>Probably Approximately Correct Learning</em> is more theoretically grounded.</p>
+<h2 id="universal-approximation-theorem">Universal Approximation Theorem</h2>
+<p>The Universal Approximation Theorem states that any neural network, with any number of of hidden layers and nodes, can be approximated by a single hidden layer MLP with some amount of nodes. This amount may be very large.</p>
+<p>(Actually, it's about approximating convex functions. See <a href="https://en.wikipedia.org/wiki/Universal_approximation_theorem">the formal statement</a>.)</p>
+<h2 id="of-n">1-of-<span class="math inline">\(N\)</span></h2>
+<p>Instead of using one number to encode <span class="math inline">\(N\)</span> classes, 1-of-<span class="math inline">\(N\)</span> classifiers use an <span class="math inline">\(N\)</span>-tuple with components zero and one. As an example, with three classes, class <span class="math inline">\(0\)</span> would become <span class="math inline">\((1, 0, 0)\)</span>, class <span class="math inline">\(1\)</span> <span class="math inline">\((0, 1, 0)\)</span>, and class <span class="math inline">\(2\)</span> <span class="math inline">\((0, 0, 1)\)</span>.</p>
+<h2 id="compression">Compression</h2>
+<p>Neural network compression is very lossy. By cutting down from <span class="math inline">\(k\)</span> inputs to <span class="math inline">\(N &lt; k\)</span> activations in the hidden layer, we will always lose information.</p>
+<p>(Can we get a bound on this? For example, if the hidden layers are activating to some finite set of integers, say zero and one, then there would be <span class="math inline">\(2^L\)</span> possible inputs to remember.)</p>
+<h2 id="recipe-for-mlp">Recipe for MLP</h2>
+<ol style="list-style-type: decimal">
+<li><p>Select inputs and outputs.</p></li>
+<li><p>Normalize inputs to some interval, usually <span class="math inline">\([0, 1]\)</span>.</p></li>
+<li>Split dataset into training, validation, and testing.
+<ul>
+<li>Various splits are possible. Common ones are 50/25/25 and 60/20/20.</li>
+</ul></li>
+<li>Decide on NN architecture.
+<ul>
+<li>How many layers?</li>
+<li>How many nodes in each layer? (Too many and we lose accuracy, not enough and we might overfit.)</li>
+</ul></li>
+<li><p>Train network until validation</p></li>
+</ol>
+<h1 id="dimensionality-reduction">Dimensionality Reduction</h1>
+<p>The book makes a big deal about the &quot;curse of dimensionality,&quot; referring to how computational complexity and the amount of data needed to train a learning algorithm increases with the number of dimensions in a dataset. In this chapter, we will learn ways to fight the curse.</p>
+<p>There are three main ways to do this:</p>
+<ul>
+<li><p><strong>Feature selection</strong>: Throw out features that aren't useful to learning. We saw an example of this with tree learning. We looked at every feature and decided what would be the best one to examine, adding features until we had a perfect classifier or had no more features.</p></li>
+<li><p><strong>Feature derivation</strong>: Create new features using combinations of old ones, then throw out the old ones. See Figure 6.1 for an example.</p></li>
+<li><p><strong>Clustering</strong>: Group together similar datapoints and see if this provides hints for features that could be removed.</p></li>
+</ul>
+<h2 id="linear-discriminant-analysis-lda">Linear Discriminant Analysis (LDA)</h2>
+<p>Linear discriminant analysis attempts to cluster data by projecting it onto a hyperplane. The hope is that classes will be separated far enough on the hyperplane so that their distance along the line will be enough to cluster them. This reduces the dimensions of the data down to one, a single scalar.</p>
+<p>There are two metrics that we consider in LDA:</p>
+<ul>
+<li><p><strong>Within-class scatter</strong>: The total amount of scatter between datapoints inside the same class. The total &quot;spread&quot; of the dataset on an <em>intra</em>-class level. Measured as <span class="math display">\[S_W = \sum_{\text{classes} \ c} p_c \operatorname{cov}(c,
+  c),\]</span> where <span class="math inline">\(p_c\)</span> is the probability of a class occurring, and <span class="math inline">\(\operatorname{cov}(c, c)\)</span> is the covariance matrix of the class <span class="math inline">\(c\)</span>. Note that this is a matrix.</p></li>
+<li><p><strong>Between-class scatter</strong>: The total amount of spread between classes themselves. The total &quot;spread&quot; of the dataset on an <em>inter</em>-class level. Measured as <span class="math display">\[S_B = \sum_{\text{classes} \ c} (\vec{\mu}_c -
+  \vec{\mu})(\vec{\mu}_c - \vec{\mu})^T,\]</span> where <span class="math inline">\(\vec{\mu}\)</span> is the mean of the entire dataset. Note that this is a matrix, as we are dealing with column vectors.</p></li>
+</ul>
+<p>We would like for <span class="math inline">\(S_W\)</span> to be small, and <span class="math inline">\(S_B\)</span> to be big. That is, we would like to maximize the ratio <span class="math inline">\(S_B / S_W\)</span>.</p>
+<p>We will be maximizing this ratio by choosing the hyperplane with the &quot;best&quot; spread to project our data onto, described by the unit vector <span class="math inline">\(\vec{w}\)</span>. For any datapoint <span class="math inline">\(\vec{x}\)</span>, the scalar projection onto our hyperplane is <span class="math inline">\(\vec{w} \cdot \vec{x}\)</span>. If we compute the within-class and between-class scatter using the scalar projections, we obtain (through some linear algebra)</p>
+<span class="math display">\[\begin{align*}
+    S_W&#39; &amp;= \vec{w}^T S_W \vec{w} \\
+    S_B&#39; &amp;= \vec{w}^T S_B \vec{w}.
+\end{align*}\]</span>
+<p>Thus, we want to maximize the ratio <span class="math inline">\(\frac{\vec{w}^T S_W \vec{w}}{\vec{W^T} S_B \vec{w}}\)</span>. In general, this is only easy if we have two classes. With two classes, the plane that will maximize this ratio is in the direction of <span class="math display">\[\vec{w} = S_W^{-1} (\mu_1 - \mu_2).\]</span></p>
+<h2 id="principal-components-analysis-pca">Principal Components Analysis (PCA)</h2>
+<p>Principal Components Analysis attempts to separate unlabeled data by transforming points so that only dimensions that datapoints &quot;vary&quot; along are examined. It is a type of feature selection.</p>
+<p>The motivation for the algorithm is very linear algebra heavy. The gist is this:</p>
+<ul>
+<li>We have a (centered) data matrix <span class="math inline">\(X\)</span> with covariance matrix <span class="math inline">\(\operatorname{cov}(X)\)</span>.</li>
+<li>Besides centering the data, we now want to rotate it. This will be done by multiplying by a rotation matrix <span class="math inline">\(P^T\)</span>. Our new dataset is <span class="math inline">\(Y = P^T X\)</span>.</li>
+<li>We want, for some reason, to choose <span class="math inline">\(P^T\)</span> such that <span class="math inline">\(\operatorname{cov}(Y)\)</span> is diagonalizable. That is, <span class="math display">\[{\operatorname{cov}\left( Y \right)} =
+  \begin{bmatrix}
+\lambda_1 &amp; \cdots &amp; \cdots &amp; \cdots \\
+\vdots &amp; \lambda_2 &amp; \cdots &amp; \cdots \\
+\vdots &amp; \vdots &amp; \lambda_3 &amp; \cdots \\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots \\
+\cdots &amp; &amp; &amp; &amp; \lambda_n
+  \end{bmatrix}.\]</span></li>
+<li>From definition of covariance, we arrive at <span class="math inline">\(\operatorname{cov}(Y) = P^T  \operatorname{cov}(X)P\)</span>. Since <span class="math inline">\(P\)</span> is a rotation matrix, its transpose is its inverse. This leads us to <span class="math display">\[P \operatorname{cov}(Y) = P P^T {\operatorname{cov}\left( X \right)} P =
+  {\operatorname{cov}\left( X \right)} P.\]</span></li>
+<li>If we write <span class="math inline">\(P\)</span> as a list of column vectors <span class="math inline">\(P = [\vec{p}_1, \vec{p}_2, \dots,  \vec{p}_n]\)</span>, then we have <span class="math display">\[P{\operatorname{cov}\left( Y \right)} = [\lambda_1 \vec{p}_1, \lambda_2
+  \vec{p}_2, \dots, \lambda_n \vec{p}_n] = {\operatorname{cov}\left( X \right)}P.\]</span></li>
+<li>Since the two matrices are equal, so are their columns. Splitting this into a system of equations, we have <span class="math display">\[\vec{\lambda} \vec{p}_k = {\operatorname{cov}\left( X \right)} \vec{p}_k.\]</span></li>
+<li>This leads us to the conclusion that the columns of <span class="math inline">\(P\)</span> are eigenvectors of <span class="math inline">\({\operatorname{cov}\left( X \right)}\)</span>.</li>
+<li>The covariance is square and symmetric, so its full complement of eigenvalues are orthogonal, and thus form an eigenspace. This means that each eigenvalue roughly corresponds to one dimensions. We want to choose the dimensions that have the larger eigenvalues.</li>
+</ul>
+<p>Algorithmic sketch:</p>
+<ol style="list-style-type: decimal">
+<li>Begin with centered data matrix <span class="math inline">\(X\)</span>.</li>
+<li>Compute the covariance matrix <span class="math inline">\(C\)</span>.</li>
+<li>Find the eigensystem of <span class="math inline">\(C\)</span>, and arrange the eigenvectors in decreasing order.</li>
+<li>Select a number of dimensions to keep, then take this number of the largest eigenvectors.</li>
+<li>Use the selected eigenvectors to transform the data, dropping the dimensions that aren't selected.</li>
+</ol>
+<h2 id="factor-analysis">Factor Analysis</h2>
+<p>The text's explanation of factor analysis is esepcially brief.</p>
+<p>Factor analysis works to create a simple linear model to describe a dataset where the elements of the model are noisy random variables. That is, given a data matrix <span class="math inline">\(X\)</span>, we construct the model <span class="math display">\[X = W F + \epsilon,\]</span> where <span class="math inline">\(F\)</span> is a random matrix describing a set of &quot;factors&quot; that we think are largely responsible for the data, <span class="math inline">\(W\)</span> is a matrix of &quot;factor loadings&quot; that describe how the factors affect the measurements, and <span class="math inline">\(\epsilon\)</span> is a normal random matrix with mean zero and variances <span class="math inline">\(\psi_i\)</span> that represents the &quot;noise&quot; in the data. Our goal is to find a matrix <span class="math inline">\(W\)</span> and set of variances <span class="math inline">\(\psi_i\)</span> that maximize the likelihood of observing <span class="math inline">\(X\)</span> given our model.</p>
+<p>As a brief example, say that <span class="math inline">\(X\)</span> are the results of an IQ test. Then, we might have <span class="math display">\[F =
+\begin{bmatrix}
+    \text{IQ}_1 &amp; \text{Height}_1 \\
+    \text{IQ}_2 &amp; \text{Height}_2
+\end{bmatrix}\]</span> and <span class="math display">\[W =
+\begin{bmatrix}
+    1 &amp; 0 \\
+    1 &amp; 0
+\end{bmatrix},\]</span> since the results of the IQ test are dependent only on the subject's IQ.</p>
+<p>Factor analysis is an EM algorithm, meaning it is composed of two very simple steps that are impossible to explain. Essentially, we compute the expectation of observing our data given the current model, differentiate it to maximize the expectation, update <span class="math inline">\(W\)</span> and each <span class="math inline">\(\psi_i\)</span>, and repeat until convergence. The steps are outlined on pages 141 and 142, with a partial code listing on page 142.</p>
+<h2 id="locally-linear-embedding">Locally Linear Embedding</h2>
+<p>(The text has a lot of confusing notation in this section. I decdided what things should be, but the code listings given should probably be consulted.)</p>
+<p>Locally Linear Embedding (LLE) works to reduce the dimensionality of a dataset by transforming higher dimensional vectors into lower dimensional ones that minimize the &quot;reconstruction error&quot; of the lower dimenison. Broadly speaking, the algorithm chooses neighborhoods around points, then places the points into a lower dimensional space around the neighborhood that minimizes some error metric.</p>
+<p>The algorithm first chooses a neighborhood around each datapoint. These neighborhoods can be created in many different ways, e.g. in the &quot;topological&quot; sense of all points within a distance <span class="math inline">\(d\)</span>, or in the <span class="math inline">\(k\)</span>-nearest neighbors sense of grabbing the closest <span class="math inline">\(k\)</span> points.</p>
+<p>After choosing a neighborhood around a point <span class="math inline">\(\vec{x}_i\)</span>, the remaining points are used to &quot;reconstruct&quot; (approximate) <span class="math inline">\(\vec{x}_i\)</span>. Each point in the dataset is assigned a weight in this reconstruction, denoted <span class="math inline">\(W_{ij}\)</span>. For every <span class="math inline">\(\vec{x}_j\)</span> not in the neighborhood of <span class="math inline">\(\vec{x}_i\)</span>, we set <span class="math inline">\(W_{ij} = 0\)</span>. Then, we have <span class="math display">\[\vec{x}_i \approx \sum_{j = 1}^N W_{ij} \vec{x}_j,\]</span> where <span class="math inline">\(N\)</span> is the number of datapoints. The dataset is then assigned a reconstruction error <span class="math inline">\(\epsilon\)</span> that is the sum-of-squares error in the reconstruction approximations: <span class="math display">\[\epsilon = \sum_{i = 1}^N \left| \vec{x}_i - \sum_{j = 1}^N
+W_{ij} \vec{x}_j \right|^2.\]</span></p>
+<p>There is no need to construct <span class="math inline">\(W\)</span> by hand. There is a method for choosing <span class="math inline">\(W\)</span> such that <span class="math inline">\(\epsilon\)</span> is minimized:</p>
+<ul>
+<li><p>For each point <span class="math inline">\(\vec{x}_i\)</span>, construct its neighborhood. Create a list of neighbor points <span class="math inline">\(\vec{z}_j\)</span>, <span class="math inline">\(j = 1, 2, \dots, K\)</span>. Let <span class="math inline">\(\vec{d}_j = \vec{z} -  \vec{x}_i\)</span> be the difference from each neighbor to <span class="math inline">\(\vec{x}_i\)</span>. Form a matrix <span class="math inline">\(D\)</span> of these differences. (<span class="math inline">\(D\)</span> must be <span class="math inline">\(N \times N\)</span>, which I am not sure how neighborhoods are guaranteed to be disjoint. For the brave, there is a partial code listing on page 146.)</p></li>
+<li><p>Compute the &quot;local covariance,&quot; defined as <span class="math inline">\(C = D D^T\)</span>. (I believe that this works out to actually be the covariance of <span class="math inline">\(D\)</span>, but it's hard to follow with all the vectors around.)</p></li>
+<li><p>Solve <span class="math inline">\(CW = I\)</span> for <span class="math inline">\(W\)</span>, where <span class="math inline">\(I\)</span> is the <span class="math inline">\(N \times N\)</span> identity. That is, <span class="math inline">\(W =  C^{-1}\)</span>.</p></li>
+<li><p>Set <span class="math inline">\(W_{ij} = 0\)</span> when <span class="math inline">\(x_j\)</span> is not in the neighborhood of <span class="math inline">\(x_i\)</span>. (In the topological sense, I feel confident that &quot;in the neighborhood of&quot; is a symmetric relation, but not so sure for <span class="math inline">\(K\)</span>-nearest neighbors.)</p></li>
+<li><p>Normalize the elements so that the matrix sums to one, i.e. set <span class="math inline">\(W_{ik} =  W_{ij}/\sum W_{ij}\)</span>.</p></li>
+</ul>
+<p>This gives us an &quot;ideal&quot; reconstruction matrix <span class="math inline">\(W\)</span> to play with.</p>
+<p>Next, we get to the &quot;embedding&quot; part. We will choose an arbitrary lower dimension <span class="math inline">\(L\)</span>, and construct the point <span class="math inline">\(\vec{y}_i\)</span> that corresponds to <span class="math inline">\(\vec{x}_i\)</span> in <span class="math inline">\(\mathbf{R^L}\)</span>. In this lower dimensional space, we create a new reconstruction error <span class="math inline">\(\epsilon_L\)</span>, defined as <span class="math display">\[\epsilon_L = \sum_{i = 1}^N
+\left| \vec{y}_i - \sum_{j = 1}^L W_{ij} \vec{y}_j \right|^2.\]</span> Note the similarity with the previous reconstruction error. To futher this analogy, we want to choose <span class="math inline">\(\vec{y}_i\)</span> such that <span class="math inline">\(\epsilon_L\)</span> is minimized. The text punts hard, and says that these vectors are given by the eigenvectors of the <em>quadratic form matrix</em> <span class="math display">\[M = (I - W)^T (I - W).\]</span></p>
+<p>The full algorithm strings these steps together, and can be found on page 145.</p>
+<h1 id="probabilistic-learning">Probabilistic Learning</h1>
+<p>A criticism of neural networks is that we cannot &quot;see&quot; what they are doing. Weights and biases may work, but they have no intuitive meaning. Other learning methods work well and are more transparent. Decision trees<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> are one example. In this chapter, we will present another, based on statistical methods.</p>
+<p>Highlights:</p>
+<ul>
+<li>EM Algorithm</li>
+<li>Unsupervised learning example</li>
+<li>Nearest neighbor methods</li>
+<li>Statistical methods</li>
+</ul>
+<h2 id="gaussian-mixture-models">Gaussian Mixture Models</h2>
+<p>Note that the text says, in Chapter 7, that &quot;we <em>will</em> [emphasis added] see lots of ways to deal&quot; with unlabeled examples in Chapter 6. We have already seen Chapter 6, in theory.</p>
+<ul>
+<li><span class="math inline">\(M\)</span>: number of Gaussian distributions.</li>
+<li><span class="math inline">\(\alpha_m\)</span>: &quot;weight&quot; of distribution <span class="math inline">\(m\)</span>.</li>
+<li><span class="math inline">\(\sum_{m = 1}^M \alpha_m = 1\)</span>.</li>
+<li><span class="math inline">\(\phi(x; \mu_m, \sigma_m)\)</span>: normal function with specified parameters.</li>
+</ul>
+<p>Define <span class="math display">\[P(x_i \in C_k) = \frac{\alpha_k \phi(x_i; \mu_k, \sigma_k)}{\sum_{m =
+1}^M \alpha_m \phi(x_i; \mu_m, \sigma_m)}\]</span> to be the probability of input <span class="math inline">\(x_i\)</span> belonging to class <span class="math inline">\(C_k\)</span>.</p>
+<p>Say that we have two normals <span class="math inline">\(G_1\)</span> and <span class="math inline">\(G_2\)</span>, where <span class="math inline">\(p\)</span> is the probability of a datapoint beloning to <span class="math inline">\(G_1\)</span>. Suppose that <span class="math inline">\(p\)</span> is also a random variable, and has probability density function <span class="math inline">\(\pi\)</span>. From the above model, we have the random variable <span class="math display">\[y = pG_1 + (1 - p)G_2.\]</span> The probability of any particular value of <span class="math inline">\(y\)</span> occuring is <span class="math display">\[P(y) = \pi \phi(y; \mu_1, \sigma_1) + (1 - \pi)
+\phi(y; \mu_2, \sigma_2).\]</span></p>
+<p>Our goal now is to iterate, trying to move the Gaussian models to fit our data correctly. For example, we will move <span class="math inline">\(\mu_1\)</span> until the curve over <span class="math inline">\(\mu_1\)</span> seems to be a good fit of the data.</p>
+<p>Essentially, <span class="math inline">\(\gamma_i\)</span> is an estimate of <span class="math inline">\(P(x_i \in C_1)\)</span>. After calculating every <span class="math inline">\(\gamma_i\)</span>, we have a rough picture of what the data looks like from our previous guesses. From this, we move the means, standard deviations, and probability <span class="math inline">\(\pi\)</span> around so that we fit the data better. We repeat this until our parameters converge.</p>
+<p>Example:</p>
+<span class="math display">\[D = \{5, 10, 4, 6, 5, 4, 6, 11, 10, 9, 5, 7, 3\}.\]</span> From drawing a graph, we conjecture that there are two normals, with
+<span class="math display">\[\begin{align*}
+    \mu_1 &amp;= 5, \quad \sigma_1 = 2, \quad \pi = \frac{9}{13} \\
+    \mu_2 &amp;= 10, \quad \sigma_2 = 1.
+\end{align*}\]</span>
+<p>After performing first M-step, we have</p>
+<span class="math display">\[\begin{align*}
+    \mu_1 &amp;= 4 \\
+    \mu_2 &amp;= 11 \\
+    \bar{y} &amp;= 6.54 \\
+    \sigma_1 = \sigma_2 &amp;= 6.38 \\
+    \pi = 0.4
+\end{align*}\]</span>
+<h2 id="information-criteria">Information Criteria</h2>
+<p>We are familiar with the validation set. This set can be used to determine when to stop training, i.e. stop when the validation error is at a local minimum. However, there are other ways to determine when to stop training. In particular, one way to do this is by measuring <em>information criteria</em>.</p>
+<p>Given models, we have two information criteria. The <em>Akaike Information Criterium</em> <span class="math display">\[\text{AIC} = \ln \mathcal{L} - k,\]</span> and the <em>Bayesian Information Criterium</em> <span class="math display">\[\text{BIC} = 2\ln \mathcal{L} - k \ln N.\]</span> Here, <span class="math inline">\(k\)</span> is the number of parameters in the model, <span class="math inline">\(N\)</span> is the number of datapoints, and <span class="math inline">\(\mathcal{L}\)</span> is &quot;best likelihood of the model.&quot; The book is very quiet about what this is or how to calculate it.</p>
+<h2 id="em-algorithm">EM Algorithm</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Expectation</strong>: Compute the expected liklihood of the model.</p></li>
+<li><p><strong>Maximization</strong>: Update the model to maximize the expected likihood.</p></li>
+</ol>
+<h1 id="support-vector-machines">Support Vector Machines</h1>
+<h2 id="perceptrons-and-their-limitations">Perceptrons and their Limitations</h2>
+<p>In Chapter 3, we encountered a simple type of neural network which could compute many functions: the <strong>Perceptron</strong>.</p>
+<p>As a quick summary of the material in the Perceptron section, recall:</p>
+<ul>
+<li><p>The perceptron defines a <em>decision boundary</em>, <span class="math inline">\(\vec{x}\vec{W}^T = 0\)</span></p>
+<ul>
+<li>In 2D, this is a line between classes.</li>
+<li>In 3D, this is a plane.</li>
+<li>In higher dimensions, we call this a hyperplane.</li>
+</ul></li>
+<li><p>The Perceptron Convergence Theorem guarantees finite-time convergence for linearly separable data sets.</p>
+<ul>
+<li><p>If we can draw a line, or plane, or hyperplane between classes in input space, then the perceptron will find a line that can do this.</p></li>
+<li><p>This will happen in a finite amount of time.</p></li>
+</ul></li>
+</ul>
+<p>Now, this theorem only applies to linearly separable datasets. If a dataset is not linearly separable, then there might be issues.</p>
+<ul>
+<li><p>Perceptrons might not work if the input space is not linearly separable.</p>
+<ul>
+<li><p>For example, take the 2D XOR function.</p></li>
+<li><p>Cannot draw a line between the XOR data, so it's not linearly separable.</p></li>
+<li><p>A perceptron will waffle between incorrect inputs, and never converge to a correct answer.</p></li>
+<li><p>This can be fixed by adding extra dimensions.</p></li>
+</ul></li>
+</ul>
+<h2 id="enter-support-vector-machines">Enter: Support Vector Machines</h2>
+<p>(This was written for section 8.1, but also from a <a href="http://nlp.stanford.edu/IR-book/html/htmledition/support-vector-machines-the-linearly-separable-case-1.html">Stanford webpage on SVMs</a>.)</p>
+<p>Support Vector Machines (SVMs) provide two important things:</p>
+<ol style="list-style-type: decimal">
+<li><p>An objective way to choose the <em>best</em> decision boundary; and</p></li>
+<li><p>A set of methods to transform any dataset into one that is linearly separable. (Example: 3D XOR function.)</p></li>
+</ol>
+<p>That is, using SVMs, we can always linearly separate data by transforming it.</p>
+<p>Also, after a brief training period, SVMs only need to remember a select few training points to classify new points.</p>
+<ul>
+<li><p>The <em>margin</em> of a linear separator is the largest radius <span class="math inline">\(M\)</span> such that no data points lie within <span class="math inline">\(M\)</span> units of the hyperplane defined by the separator.</p></li>
+<li><p>If there exists a linear separator with a margin larger than any other, it is the <em>maximum margin classifier</em>. This is considered to be the optimal linear separator.</p></li>
+<li><p>Points that are exactly <span class="math inline">\(M\)</span> units away from a linear classifier are called <em>support vectors</em>. (Measured by <span class="math inline">\(|\vec{w} \cdot \vec{x} + b| = M\)</span>.)</p></li>
+<li><p>The margin of a linear classifier with weights <span class="math inline">\(\vec{w}\)</span> is <span class="math inline">\(1/|\vec{w}|\)</span>. (The derivation is rather long, and very confusing in our textbook. See the Stanford webpage for a better derivation.)</p></li>
+<li><p>Given a point <span class="math inline">\(\vec{x}\)</span> with target <span class="math inline">\(t = \pm 1\)</span>, a measure of the goodness of the classification of <span class="math inline">\(\vec{x}\)</span> is the <em>functional distance</em> <span class="math inline">\(t(\vec{w} \cdot  \vec{x} + b)\)</span>.</p>
+<ul>
+<li><p>General measure of how well classified a point is; the larger the value is, the better it was classified.</p></li>
+<li><p>Positive for correct classifications, and negative for incorrect classifications.</p></li>
+</ul></li>
+</ul>
+<h3 id="finding-the-maximum-margin-classifier">Finding the Maximum Margin Classifier</h3>
+<p>We need to</p>
+<ol style="list-style-type: decimal">
+<li><p>Find the largest margin possible; and</p></li>
+<li><p>Make sure that classifications are still &quot;good.&quot;</p></li>
+</ol>
+<p>Maximizing the margin is the same as minimizing <span class="math inline">\(\frac{1}{2} |\vec{w}|^2\)</span>. The <span class="math inline">\(\frac{1}{2}\)</span> factor is for convenience, and the square does not effect anything, since the square root function is increasing for nonnegative inputs anyway.</p>
+<p>For the &quot;good&quot; requirement, we arbitrarily require that the functional distance is greater than one. That is, that <span class="math inline">\(t (\vec{w} \cdot \vec{x} + b) \geq 1\)</span>. Equality is obtained only with support vectors.</p>
+<p>This gives us a constrained optimization problem:</p>
+<p>Let <span class="math inline">\(\vec{x_i}\)</span> and <span class="math inline">\(t_i\)</span>, <span class="math inline">\(i = 1, 2, \dots, n\)</span> be sequences of input vectors and targets, respectively, where <span class="math inline">\(t_i = \pm 1\)</span>. Then,</p>
+<p><span class="math display">\[\text{minimize } \frac{1}{2} |\vec{w}|^2 \text{ under the constraint } t
+(\vec{w} \cdot \vec{x} + b) \geq 1, i = 1, 2, \dots, n.\]</span></p>
+<p>This problem can be solved using the Karush–Kuhn–Tucker (KKT) method, which is a generalization of the method of Lagrange multipliers that allows for inequalities. Once the problem has been set up, we can place it into a solver that will do the heavy lifting for us. We will not get too much into this right now<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>, but here are the high points:</p>
+<ul>
+<li><p>We seek a <span class="math inline">\(\vec{w}^*\)</span> and <span class="math inline">\(b^*\)</span> such that <span class="math inline">\(\vec{w}^* \cdot \vec{x} + b* = 0\)</span> is a maximum margin classifier.</p></li>
+<li><p>The solver will provide us with a vector of Lagrange multipliers <span class="math inline">\(\vec{\lambda}\)</span> such that <span class="math display">\[\vec{w}^* = \sum_{k = 1}^n \lambda_k t_k
+  \vec{x_k}\]</span> and <span class="math display">\[b^* = \frac{1}{N} \sum_{\text{support vectors } s}
+  \left(t_j - \sum_{k = 1}^n \lambda_k t_k \vec{x_k} \cdot \vec{x_s} \right),\]</span> where <span class="math inline">\(N\)</span> is the number of support vectors.</p></li>
+</ul>
+<p>This method will allow us to find an optimal minimum classifier for any linearly separable dataset. The next step for SVMs is handling datasets that are not linearly separable.</p>
+<h3 id="questions-and-clarifications">Questions and Clarifications</h3>
+<ul>
+<li><p>In the definition of a margin, <span class="math inline">\(M\)</span> is defined to be the largest radius such that no datapoints lie within <span class="math inline">\(M\)</span> units of the hyperplane. In Figure 8.2, the margin bounding region is drawn with a solid line, indicating that no points lie exactly <span class="math inline">\(M\)</span> units away. In other words, for every datapoint <span class="math inline">\(\vec{x}\)</span>, we have <span class="math inline">\(|\vec{w} \cdot \vec{x} + b| &gt; M\)</span>.</p>
+<p>Almost immediately, support vectors are defined to be the points <span class="math inline">\(\vec{x}\)</span> such that <span class="math inline">\(\vec{w} \cdot \vec{x} + b = M\)</span>. So, let's all just agree that the boundary line in Figure 8.2 should be dotted, and that every datapoint <span class="math inline">\(\vec{x}\)</span> satisfies <span class="math inline">\(|\vec{w} \cdot \vec{x} + b| \geq M\)</span>.</p></li>
+<li><p>After Equation 8.11, the text mentions that the SVM's optimal linear classifier has the property that prediction relies on computing the dot product of the input vector and <em>only</em> the support vectors. However, the relevant term is <span class="math display">\[\vec{z} \cdot \sum_{k = 1}^n \lambda_k t_k \vec{x_k},\]</span> which is certainly over all training vectors <span class="math inline">\(\vec{x_k}\)</span>, and not just the support vectors. What are they talking about?</p></li>
+</ul>
+<h2 id="kernels">Kernels</h2>
+<p>As previously mentioned, the point of a linear classifier to draw a hyperplane between linearly separable datasets. This was not always possible when datasets were not linearly separable, as in the case of the XOR function. To fix this, we will introduce kernels, which are computationally simple ways to make any dataset linearly separable.</p>
+<h3 id="transformations">Transformations</h3>
+<p>Let <span class="math inline">\(X\)</span> be our input space; usually this is some <span class="math inline">\(\mathbf{R^n}\)</span>. To transform our datapoints <span class="math inline">\(\vec{x} \in X\)</span>, we will define a <em>feature mapping</em> <span class="math inline">\(\phi\colon X \to V\)</span> such that <span class="math inline">\(\phi(\vec{x})\)</span> is the transformation of the input <span class="math inline">\(\vec{x}\)</span>, where <span class="math inline">\(V\)</span> is some other input space, usually of a higher dimension.</p>
+<p>Assuming that this mapping creates a linear separable dataset, we can apply the KKT method to find our optimal linear classifier in this new input space, giving us the optimal parameters</p>
+<span class="math display">\[\begin{align*}
+\vec{w}^* &amp;= \sum_{k = 1}^n \lambda_k t_k \phi(\vec{x_k}) \\
+b^* &amp;= \frac{1}{N} \sum_{\text{support vectors } s}
+        \left(t_j - \sum_{k = 1}^n \lambda_k t_k \phi(\vec{x_k}) \cdot \phi(\vec{x_s}) \right)
+\end{align*}\]</span>
+<p>To make predictions of a new input <span class="math inline">\(\vec{z}\)</span>, we need to map <span class="math inline">\(z\)</span> with <span class="math inline">\(\phi\)</span>, then compute <span class="math display">\[\vec{w}^* \cdot \phi(\vec{z}) + b^*,\]</span> using these vectors from the new input space <span class="math inline">\(V\)</span>. The vectors of <span class="math inline">\(V\)</span> may have a very large dimension, and this may take a very long time. To get around this computation, we will introduce <em>kernels</em>.</p>
+<h3 id="kernels-and-the-kernel-trick">Kernels and the Kernel Trick</h3>
+<p>Let <span class="math inline">\(K\colon X^2 \to \mathbf{R}\)</span> be a symmetric mapping. Then, <span class="math inline">\(K\)</span> is a <em>kernel function</em> iff it is positive definite (p.d.), as defined below. That is, the function <span class="math inline">\(K\)</span> is a kernel iff</p>
+<ul>
+<li>(Positive definite) For all <span class="math inline">\(&lt;c_0, c_1, \dots, c_n&gt; \in \mathbf{R^n}\)</span> and <span class="math inline">\(\vec{x_i} \vec{x_j} \in X\)</span>, <span class="math display">\[\sum_{\substack{1 \leq j \leq n \\ 1 \leq i
+  \leq n}} c_i c_j K(\vec{x_i}, \vec{x_j}) \geq 0;\]</span></li>
+<li>(Symmetric) <span class="math inline">\(K(\vec{x}, \vec{y}) = K(\vec{y}, \vec{x})\)</span> for all <span class="math inline">\(\vec{x},  \vec{y} \in X\)</span>.</li>
+</ul>
+<p>The key point of this definition is an application of Mercer's Theorem<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>: <em>if there exists a positive definite kernel on an input space <span class="math inline">\(X\)</span>, then there exists a feature mapping <span class="math inline">\(\phi\colon X \to V\)</span> such that <span class="math inline">\(K(\vec{x}, \vec{y}) = \phi(\vec{x}) \cdot \phi(\vec{y})\)</span>.</em> That is, if we have a kernel, then we are always implicitly computing the dot product of vectors in a higher dimension, without ever working in that higher dimension. Using kernels to avoid this higher-dimensional computation is the <em>kernel trick</em>.</p>
+<p>Practically, the kernel trick means that by replacing all dot products that the SVM computes with the kernel computation, we will be implicitly using higher dimensions. To force linear separability, we punt into a higher dimension, then the kernel trick punts us right back to where we started.</p>
+<p>With the kernel trick in mind, we do not need to find a feature mapping <span class="math inline">\(\phi\)</span> anymore; we only need to find positive definite kernels that are easy to compute. Luckily, there are a few standard kernels and functions that they come from:</p>
+<ul>
+<li><p>The polynomial kernel of degree <span class="math inline">\(d\)</span>: <span class="math inline">\(K(\vec{x}, \vec{y}) = (1 + \vec{x}  \cdot \vec{y})^d\)</span>.</p></li>
+<li><p>The sigmoid kernel with parameters <span class="math inline">\(k\)</span> and <span class="math inline">\(\delta\)</span>: <span class="math inline">\(K(\vec{x}, \vec{y}) =  \tanh(k \vec{x} \cdot \vec{y} - \delta)\)</span>.</p></li>
+<li><p>The radial basis function with parameter <span class="math inline">\(\sigma\)</span>: <span class="math inline">\(K(\vec{x}, \vec{y}) =  \exp(-|\vec{x} - \vec{y}|^2 / 2\sigma)\)</span>. (The text incorrectly gives the vector factor as <span class="math inline">\((\vec{x} - \vec{y})^2\)</span>, which is not a scalar.)</p></li>
+</ul>
+<h3 id="kernel-clarification">Kernel Clarification</h3>
+<p>Question: How does using a kernel actually avoid the computation in the higher dimension? The formally doesn't readily explain this. Answer: Because of vector stuff.</p>
+<p>Recall that the optimized weight vector, <span class="math inline">\(\vec{w}^*\)</span>, is given by the equation <span class="math display">\[\vec{w}^* = \sum_{k = 1}^n \lambda_k t_k \vec{x_k},\]</span> where <span class="math inline">\(t_k\)</span> is the target for <span class="math inline">\(\vec{x_k}\)</span>, and <span class="math inline">\(\vec{\lambda}\)</span> is given by <code>cvxopt</code> after employing KKT. If we use a mapping <span class="math inline">\(\phi\colon X \to V\)</span>, then the classification computation for an input <span class="math inline">\(\vec{z}\)</span> becomes <span class="math display">\[\left(\sum_{k =
+1}^n \lambda_k t_k \phi(\vec{x_k}) \right) \cdot \phi(\vec{z}) + b^*.\]</span> Of course, the inner product is distributive over vector addition, so this becomes <span class="math display">\[\sum_{k = 1}^n \lambda_k t_k \phi(\vec{x_k}) \cdot \phi(\vec{z}) + b^*.\]</span> At this point, knowing a kernel, we can replace the inner product <span class="math inline">\(\phi(\vec{x_k}) \cdot \phi(\vec{z})\)</span> with <span class="math inline">\(K(\vec{x}, \vec{z})\)</span>, where <span class="math inline">\(K\)</span> is a kernel of <span class="math inline">\(\phi\)</span>.</p>
+<p>Equipped with the kernel, the only thing left to compute is compute <span class="math inline">\(b^*\)</span>. This computation only requires computing dot products <span class="math inline">\(\phi(\vec{x_k}) \cdot \phi(\vec{x_j})\)</span>, which can be replaced with kernel computations.</p>
+<p>The book talks about another <span class="math inline">\(K\)</span>, the Gram matrix, or the kernel of distances. This is a confusing name and symbol; as far as I can tell it is not the actual kernel. The book is remarkably silent on how this matrix works.</p>
+<h2 id="the-karush--kuhn--tucker-method">The Karush--Kuhn--Tucker Method</h2>
+<p>If you were sick of the math <em>before</em>...</p>
+<p>The Karush--Kuhn--Tucker method is used in support vector machines (SVMs) to find the optimal linear classifier. It does this by minimizing <span class="math inline">\(\frac{1}{2}|\vec{w}|^2\)</span> subject to <span class="math inline">\(t_i y_i \geq 1\)</span> for <span class="math inline">\(i = 1, 2, \dots, n\)</span>. The goal of KKT is to handle this inequality.</p>
+<p>Before introducing KKT, we will describe the Lagrangian to see where KKT differs.</p>
+<h3 id="the-lagrangian">The Lagrangian</h3>
+<p>We wish to minimize the function <span class="math inline">\(f(\vec{x})\)</span> subject to the list of constraints <span class="math inline">\(g_k(\vec{x}) = 0\)</span>, <span class="math inline">\(k = 1, 2, \dots, n\)</span>. There are two possibilities:</p>
+<ol style="list-style-type: decimal">
+<li><p>The gradient of <span class="math inline">\(f\)</span> is parallel to the gradient of each <span class="math inline">\(g_k\)</span>, so that moving along <span class="math inline">\(g_k(\vec{x}) = 0\)</span> will not decrease <span class="math inline">\(f\)</span>; or</p></li>
+<li><p>The gradient of <span class="math inline">\(f\)</span> is zero, so that <span class="math inline">\(f\)</span> is at a minimum.</p></li>
+</ol>
+<p>The minima of <span class="math inline">\(f\)</span> will <em>possibly</em> occur when one of these two conditions do. These conditions can be succinctly summarized by defining the Lagrangian <span class="math display">\[{\mathcal{L}}(\vec{x}, \vec{\lambda}) = f(\vec{x}) + \sum_{k = 1}^n \lambda_k
+g_k(\vec{x}),\]</span> where <span class="math inline">\(\vec{\lambda}\)</span> is a vector of multiples meant to describe all possibilities of parallel vectors. At critical points of <span class="math inline">\({\mathcal{L}}\)</span>, i.e. when <span class="math inline">\(\nabla {\mathcal{L}}= \vec{0}\)</span>, we have <span class="math display">\[\frac{\partial {\mathcal{L}}}{\partial
+\lambda_k} = g_k(\vec{x}) = 0,\]</span> so that the constraints are satisfied, and <span class="math display">\[\nabla_{\vec{x}} f(\vec{x}) + \sum_{k = 1}^n \lambda_k \nabla_{\vec{x}}
+g_k(\vec{x}) = \vec{0},\]</span> a technical condition that ensures that <span class="math inline">\(\vec{x}\)</span> is a local minimum<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>. This gives us enough equations to completely determine <span class="math inline">\(\vec{x}\)</span> and <span class="math inline">\(\vec{\lambda}\)</span>, if such a solutions exists.</p>
+<p>In summary, <em>if a point is a minimum for the Lagrangian, it is a minimum for <span class="math inline">\(f\)</span> subject to the given equality constraints.</em> Thus we solve the system given by <span class="math inline">\(\nabla {\mathcal{L}}= \vec{0}\)</span>.</p>
+<p>Note that this method only handles equality constraints, i.e. <span class="math inline">\(g(\vec{x}) = 0\)</span>. KKT will allow us to handle inequalities as well.</p>
+<h3 id="kkt-extending-the-lagrangian-with-inequalities">KKT: Extending the Lagrangian with Inequalities</h3>
+<p>For KKT, we keep our equality restraints <span class="math inline">\(g_k(\vec{x}) = 0\)</span>, but now add the list of inequality restraints <span class="math display">\[h_j(\vec{x}) \leq 0, \quad j = 1, 2, \dots,
+m.\]</span> Just as we introduced the vector <span class="math inline">\(\vec{\lambda}\)</span> for equality constraints, we will introduce the vector <span class="math inline">\(\vec{\mu}\)</span> for inequality restraints. Our Lagrangian becomes <span class="math display">\[{\mathcal{L}}(\vec{x}, \vec{\lambda}, \vec{\mu}) = f(\vec{x}) +
+\sum_{k = 1}^n \lambda_k g_k(\vec{x}) + \sum_{k = 1}^m \mu_k h_k(\vec{x}).\]</span></p>
+The procedure for this extended Lagrangian is identical to the original one for <span class="math inline">\(\vec{x}\)</span>. We find the critical points with respect to <span class="math inline">\(\vec{x}\)</span>, giving
+<span class="math display">\[\begin{equation}
+\label{kkt-stationary}
+\nabla_{\vec{x}} f(\vec{x}) + \sum_{k = 1}^n \lambda_k \nabla_{\vec{x}}
+g_k(\vec{x}) + \sum_{k = 1}^m \mu_k \nabla_{\vec{x}} h_k(\vec{x}) = \vec{0}.
+\end{equation}\]</span>
+<p>This ensures that <span class="math inline">\(\vec{x}\)</span> is a local minimum.</p>
+Next, we find the critical points with respect to <span class="math inline">\(\vec{\lambda}\)</span>, but in a slightly different way. For some reason<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>, the solution <span class="math inline">\(\vec{x}\)</span> depends on <span class="math inline">\(\vec{\lambda}\)</span>, so we may not treat functions of <span class="math inline">\(\vec{x}\)</span> as constant with respect to <span class="math inline">\(\vec{\lambda}\)</span>. Practically, this means that we solve
+<span class="math display">\[\begin{equation}
+\label{kkt-equality}
+\nabla_{\vec{\lambda}} f(\vec{x}) + \sum_{k = 1}^n
+\nabla_{\vec{\lambda}} (\lambda_k g_k(\vec{x})) + \sum_{k = 1}^m
+\nabla_{\vec{\lambda}} (\mu_k h(\vec{x})) = \vec{0}.
+\end{equation}\]</span>
+Finally, the inequality restraints are completely different. Instead of solving <span class="math inline">\(\nabla_{\vec{\mu}} {\mathcal{L}}= 0\)</span>, for technical reasons, we have the following requirements:
+<span class="math display">\[\begin{align}
+\label{kkt-inequality}
+\mu_j
+h_j(\vec{x}) &amp;= 0, \quad j = 1, 2, \dots, m \\
+\mu_j &amp;\geq 0. \label{kkt-nonnegative}
+\end{align}\]</span>
+<p>Solving the system given by , , , and  will give us possible minima.</p>
+<h2 id="svm-algorithm-outline">SVM Algorithm Outline</h2>
+<p>After discussing the theoretical aspect of SVMs, we turn our attention to the algorithm itself and its implementation. The implementation is provided by the book, so we will mostly sketch the outline and discuss the software used.</p>
+<p>The Python package <code>cvxopt</code> (convex optimization) is required for the book's implementation. The free and open source package package numerically solves convex optimization problems. More details can be found at <a href="http://cvxopt.org/">the cvxopt homepage</a>.</p>
+<p>The algorithm is fairly straightforward, math aside. The authors choose to support three different kernels: the linear, polynomial, and radial basis function (RBF) kernels. There is some slight initialization to handle this fact.</p>
+<ol style="list-style-type: decimal">
+<li>Compute the Gram matrix <span class="math inline">\(K = XX^T\)</span>, where <span class="math inline">\(X\)</span> is the column vector containing every datapoint.</li>
+</ol>
+<ul>
+<li>Linear kernel: return <span class="math inline">\(K\)</span>.</li>
+<li>Polynomial kernel of degree <span class="math inline">\(d\)</span>: return <span class="math inline">\(\frac{K^d}{\sigma}\)</span>, where <span class="math inline">\(\sigma\)</span> is a parameter.</li>
+<li>RBF: return <span class="math inline">\(K_{ij} = \exp(-|x_i - x_j|^2 / \sigma^2)\)</span>.</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Solve for <span class="math inline">\(\vec{\lambda}\)</span> using <code>cvxopt</code>.</li>
+</ol>
+<p>We will use <code>cvxopt</code>'s quadratic solver, <code>cvxopt.solvers.qp()</code>. Its signature is <code>cvxopt.solvers.qp(P, q, G, h, A, b)</code>, and it minimizes <span class="math display">\[\frac{1}{2}
+\vec{x} \cdot P\vec{x}\]</span> subject to <span class="math display">\[G\vec{x} \leq \vec{h}, \quad A\vec{x} =
+\vec{b}.\]</span> The text derives the appropriate values for these variables in terms of the Gram matrix <span class="math inline">\(K\)</span> and <span class="math inline">\(\vec{\lambda}\)</span>.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Compute <span class="math inline">\(b^*\)</span>.</li>
+</ol>
+<p>This completes the set up of the SVM. It is now ready to classify new datapoints.</p>
+<h1 id="optimization-and-search">Optimization and Search</h1>
+<h2 id="line-searches-and-gradient-descent">Line Searches and Gradient Descent</h2>
+<p>In many types of learning, we want to minimize some error function <span class="math inline">\(f\)</span>. There are many ways to do this, but the simplest is called a <em>line search</em>. In this method, we have some initial guess for the minima, <span class="math inline">\(\vec{x}_0\)</span>, and we follow a line in some preset direction for some preset distance to the next guess. That is, we pick our next guess with the equation <span class="math display">\[\vec{x}_{n + 1} = \vec{x}_n +
+\eta_n \vec{p}_n,\]</span> where <span class="math inline">\(\vec{p}_n\)</span> is the direction of the line, and <span class="math inline">\(\eta_n\)</span> is the distance to follow along the line.</p>
+<p>With this equation, we are free to pick the direction <span class="math inline">\(\vec{p}_n\)</span> and the distance <span class="math inline">\(\eta_n\)</span>. Different methods of choosing these will give us different search techniques. For example, setting <span class="math inline">\(\vec{p}_n = -\nabla f(\vec{x}_n)\)</span> gives us gradient descent.</p>
+<p>The choice of <span class="math inline">\(\vec{p}_n = -\nabla f(\vec{x}_n)\)</span> is usually due to the fact that <span class="math inline">\(-\nabla f(\vec{x}_n)\)</span> is the direction of greatest decrease for <span class="math inline">\(f\)</span>. However, we can also derive this direction by considering different approximations for <span class="math inline">\(f\)</span>.</p>
+<p>These approximations are extensions of taylor expansions of single-variable functions. Recall that a single variable function <span class="math inline">\(g(x)\)</span> may be approximated as <span class="math display">\[g(x) \approx g(x_0) + g&#39;(x_0)(x - x_0) + g&#39;&#39;(x_0)(x - x_0)^2 + \cdots.\]</span> For functions of multiple variables, we will replace <span class="math inline">\(g&#39;\)</span> and <span class="math inline">\(g&#39;&#39;\)</span> with more general &quot;derivatives&quot; called the gradient and Hessian, respectively.</p>
+<p>First, we have the linear approximation <span class="math display">\[f(\vec{x} + \vec{p}) \approx
+f(\vec{x}_n) + \nabla f(\vec{x}_n) \cdot \vec{p} + o(|\vec{p}|).\]</span> If we minimize this with respect to <span class="math inline">\(\vec{p}\)</span>, we end up with <span class="math inline">\(\vec{p} = -\nabla f(\vec{x}_n)\)</span>, which recovers gradient descent.</p>
+<p>Next, we have the quadratic approximation <span class="math display">\[f(\vec{x} + \vec{p}) \approx
+f(\vec{x}_n) + \nabla f(\vec{x}_n) \cdot \vec{p} + \frac{1}{2} \vec{p}^T
+H(f(\vec{x_n})) \vec{p} + o(|\vec{p}|^2),\]</span> where <span class="math inline">\(H(f(\vec{x}))\)</span> is the Hessian matrix of second derivatives, <span class="math display">\[H(f(\vec{x})) =
+\begin{bmatrix}
+    f_{x_1 x_1}(\vec{x}) &amp; f_{x_1 x_2}(\vec{x}) &amp; \cdots &amp; f_{x_1 x_n}(\vec{x}) \\
+    f_{x_2 x_1}(\vec{x}) &amp; f_{x_2 x_2}(\vec{x}) &amp; \cdots &amp; f_{x_2 x_n}(\vec{x}) \\
+    \vdots &amp; \vdots &amp; \vdots &amp; \vdots \\
+    f_{x_n x_1}(\vec{x}) &amp; f_{x_n x_2}(\vec{x}) &amp; \cdots &amp; f_{x_n x_n}(\vec{x})
+\end{bmatrix}.\]</span> If we minimize this equation with respect to <span class="math inline">\(\vec{p}\)</span>, then we obtain <span class="math display">\[\vec{p} = - (H(f(\vec{x}_n)))^{-1} \nabla f(\vec{x}_n).\]</span> This direction is called the <em>Newton direction</em>.</p>
+<p>The computational complexity of the Newton direction is fairly high; we need to compute the inverse of the Hessian matrix. However, according to the text, the payoff is that our step size <span class="math inline">\(\eta\)</span> is always set to one.</p>
+<h2 id="conjugate-gradients">Conjugate Gradients</h2>
+<p>The goal of conjugate gradients is to spend a little more time thinking about what directions and how far along them to step to minimize the number of steps taken. In fact, the goal is, in <span class="math inline">\(n\)</span> dimensions, to take exactly <span class="math inline">\(n\)</span> steps to reach the minimum of a function.</p>
+<p>Except for when the error function is linear, this goal is almost never reached, but the method of conjugate gradients will still improve on line searches.</p>
+<p>For the direction <span class="math inline">\(\vec{p}_n\)</span>, conjugate gradients makes two choices. For the first step, we follow gradient descent and set <span class="math inline">\(\vec{p}_0 = -\nabla f(\vec{x}_0)\)</span>. After this, we apply what is called a <em>Gram--Schmidt process</em> to discover the directions. In <span class="math inline">\(n\)</span> dimensions, we create the sequence of <span class="math inline">\(n\)</span> coordinate axis vectors <span class="math inline">\(\vec{u}_k\)</span>. Then, the direction is given by <span class="math display">\[\vec{p}_n = \vec{u}_n + \sum_{k = 1}^{n - 1} \beta_{k} \vec{p}_k,\]</span> where <span class="math display">\[\beta_{k} = \frac{|\nabla f(\vec{x}_k)|^2}{|\nabla f(\vec{x}_{k - 1})|^2}.\]</span></p>
+<p>For the step size <span class="math inline">\(\alpha_n\)</span>, conjugate gradients uses Newton--Raphson iteration to derive the optimal <span class="math display">\[\alpha_n = \frac{\nabla f(\vec{x}_n) \cdot
+\vec{p}}{\vec{p}^T H(f(\vec{x}_n)) \vec{p}}.\]</span></p>
+<p>From here, the algorithm on page 200 is fairly straightforward. It is essentially the line search, but making the choices described above.</p>
+<h1 id="the-levenberg-marquardt-algorithm">The Levenberg-Marquardt Algorithm</h1>
+<p>(The text does a terrible job of explaining where equations and final statement of problems come from. In particular, the jump to Equations (9.16) and (9.17) is abrupt. <a href="http://mathworld.wolfram.com/Levenberg-MarquardtMethod.html">Wolfram's MathWorld</a> was a great help here.)</p>
+<p>The Levenberg-Marquardt Algorithm (LMA) is a line-search trust-region algorithm used to minimize linear <em>and</em> non-linear least-square problems. That is, it seeks to minimize functions of the form <span class="math display">\[f(\vec{x}) = \frac{1}{2} \sum_{k =
+1}^n r_k(\vec{x})^2 = \frac{1}{2} | \vec{r}(\vec{x}) |^2.\]</span> As a <em>line search</em> algorithm, it has a particular way of determining the direction to search in, involving Jacobians and linear least-square methods. Overall, it is a <em>trust region</em> algorithm because it makes assumptions about the function being minimized within a particular region, called a <em>trust region</em>.</p>
+<h2 id="search-direction">Search Direction</h2>
+<p>Recall that a line search algorithm works by choosing an initial guess <span class="math inline">\(\vec{x}_0\)</span>, then defining each later point by the equation <span class="math display">\[\vec{x}_{n + 1} =
+\vec{x}_n + \alpha_n \vec{p}_n,\]</span> where <span class="math inline">\(\alpha_n\)</span> is the search length and <span class="math inline">\(\vec{p}_n\)</span> is the search direction.</p>
+<p>LMA sets <span class="math inline">\(\alpha_n = 1\)</span> and then chooses <span class="math inline">\(\vec{p}\)</span> in a way that blends two other methods: gradient descent and the Gauss-Newton method. Gradient descent chooses the direction <span class="math inline">\(\vec{d}_n = -\nabla f(x_n)\)</span>, which ends up being defined by <span class="math display">\[\nabla f(x_n)_j = \sum_{k = 1}^n r_k(\vec{x}) \frac{\partial r_k}{\partial
+x_j}.\]</span> If we let <span class="math inline">\(J\)</span> denote the Jacobian of <span class="math inline">\(\vec{r}\)</span>, then this gradient works out to be <span class="math display">\[\nabla f(\vec{x}) = J^T \vec{r}.\]</span> Jumping straight to Jacobians, the Gauss-Newton method direction is <span class="math display">\[\vec{g} = (J^T J)^{-1} J^T
+\vec{r}.\]</span> (For technical reasons, i.e. <span class="math inline">\(J\)</span> may not be square, this inverse does not always simplify nicely.) Finally, LMA chooses the direction <span class="math display">\[\vec{l}
+= -(J^T J + \lambda I)^{-1} J^T \vec{r},\]</span> where the parameter <span class="math inline">\(\lambda\)</span> is a &quot;dampening&quot; parameter and <span class="math inline">\(I\)</span> is the identity matrix. According to <a href="http://people.duke.edu/~hpgavin/ce281/lm.pdf">smart people</a>, if <span class="math inline">\(\lambda\)</span> is large, then this direction is approximately the same as gradient descent; if it is small, then the direction is approximately the same as Gauss-Newton.</p>
+<p>The trust region as a region where we assume that the function <span class="math inline">\(f\)</span> being minimized is roughly quadratic. This is an approximating assumption LMA makes that throws away terms of the taylor expansion of <span class="math inline">\(f\)</span>. The size of the trust region is roughly inversely proportional to the value <span class="math inline">\(\lambda\)</span>. The &quot;trust region growing&quot; means that <span class="math inline">\(\lambda\)</span> decreases, or that we are more comfortable choosing the more aggressive Gauss-Newton direction. The &quot;trust region shrinking&quot; means that <span class="math inline">\(\lambda\)</span> increases, or that we are more cautious and prefer the standard gradient descent direction.</p>
+<h2 id="algorithmic-sketch">Algorithmic Sketch</h2>
+<p>The only head-scratching part in this is evaluating the quadratic trust region assumption. If a function is quadratic, then we can closely predict its change. If this prediction is off, then we shrink our trust region. If it is acceptable, then we change nothing. If it is good, then we increase our trust region.</p>
+<p>(This is a good-faith effort to combine the strange text algorithm with its online implementation.)</p>
+<ul>
+<li><p>Choose an initial guess <span class="math inline">\(\vec{x}_0\)</span> for the minimum of <span class="math inline">\(f(\vec{x})\)</span>.</p></li>
+<li>While <span class="math inline">\(J^T \vec{r} &gt; \epsilon &gt; 0\)</span> and a maximum number of iterations is not exceeeded:
+<ul>
+<li>repeat until a new point is found
+<ul>
+<li><p>Solve <span class="math inline">\(\vec{l} = -(J^T J + \lambda I)^{-1} J^T \vec{r}\)</span> using linear least-squares methods.</p></li>
+<li><p>Set <span class="math inline">\(\vec{x}_{n + 1} = \vec{x}_n + \vec{l}\)</span>.</p></li>
+<li>Evaluate how well our trust region assumption is working.
+<ul>
+<li>actual = <span class="math inline">\(|f(\vec{x}_{n + 1}) - f(\vec{x}_n)|\)</span></li>
+<li>predicted = <span class="math inline">\(\nabla f(\vec{x}_n) \cdot (\vec{x}_{n + 1} -  \vec{x})\)</span> (note the probable typo on page 196)</li>
+<li>set <span class="math inline">\(\rho =\)</span> actual/predicted</li>
+</ul></li>
+<li>If <span class="math inline">\(0 &lt; \rho &lt; 0.25\)</span>:
+<ul>
+<li>accept new step</li>
+</ul></li>
+<li>If <span class="math inline">\(0.25 &lt; \rho\)</span>:
+<ul>
+<li>accept new step</li>
+<li>increase trust region (decrease <span class="math inline">\(\lambda\)</span>)</li>
+</ul></li>
+<li>Else (<span class="math inline">\(\rho \leq 0\)</span> (?)<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>):
+<ul>
+<li>reject new step</li>
+<li>reduce trust region (increase <span class="math inline">\(\lambda\)</span>)</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+<h1 id="genetic-algorithms">Genetic Algorithms</h1>
+<p>A genetic algorithm applies concepts from evolution to search a solution space in both exploitative and exploratory ways.</p>
+<h2 id="general-description">General Description</h2>
+<p>A genetic algorithm requires: - An <em>alphabet</em> to construct <em>strings</em> from. - A <em>fitness function</em> to describe how good a string is. - An initial <em>population</em> of test strings. - A way to <em>generate and replace</em> new offspring.</p>
+<p><strong>Strings</strong>:</p>
+<ul>
+<li>Some way to encode information about a solution.</li>
+<li>Should <em>not</em> include any information aside from the solution, i.e. no information about optimal solutions.</li>
+<li>Keep as small as possible.</li>
+</ul>
+<p><strong>Fitness function</strong>:</p>
+<ul>
+<li>Takes a string and outputs a number called the <em>fitness</em> of that string.</li>
+<li>Higher fitness means more fit.</li>
+<li>Nonnegative function.</li>
+</ul>
+<p><strong>Population</strong>:</p>
+<ul>
+<li>Large list of possible solutions as strings.</li>
+</ul>
+<p><strong>Parent Selection</strong>:</p>
+<p>When looking at a population, we need to pick some number to act as parents for the next generation. In general, we would like to select the most fit population members, but also to allow some exploration. See page 215.</p>
+<h2 id="the-knapsack-problem">The Knapsack Problem</h2>
+<p>Suppose that we have a knapsack with a finite carrying capacity, and we want to place objects of different weights into it. In general, there is too much weight to carry everything. How do we place items into the knapsack to maximize the weight that we take?</p>
+<p>This problem is simple, but is very computationally complex. It is NP-complete.</p>
+<p>Here are a few algorithms to convince us that the problem is hard:</p>
+<ul>
+<li>Exhaustive algorithm
+<ul>
+<li>Checks every possible solution.</li>
+<li>Guaranteed to find the optimal solution, given enough time.</li>
+<li>For <span class="math inline">\(n\)</span> items, there are <span class="math inline">\(2^n\)</span> ways to pack them (not accounting for invalid combinations), so this is <span class="math inline">\(O(2^n)\)</span>.</li>
+</ul></li>
+<li>Greedy algorithms
+<ul>
+<li>Grab heaviest/lightest object at each step.</li>
+<li>Not guaranteed to find the optimal solution, and usually won't.</li>
+<li>For <span class="math inline">\(n\)</span> items, there are <span class="math inline">\(O(n)\)</span> steps.</li>
+</ul></li>
+</ul>
+<p>Between these, we can choose exponential time for an accurate solution, or linear time for a poor solution. We hope to use genetic algorithms to find acceptable solutions while keeping fairly low time complexity.</p>
+<p>Suppose that we have <span class="math inline">\(L\)</span> items, a max weight of <span class="math inline">\(M\)</span>, and that the weight of item <span class="math inline">\(k\)</span> is <span class="math inline">\(w(k)\)</span>.</p>
+<p>We will use binary strings to encode solutions, where a 1 in position <span class="math inline">\(k\)</span> means we are taking item <span class="math inline">\(k\)</span>, and a 0 there means we are not taking it.</p>
+<p>The fitness function we will use is <span class="math display">\[f(k) =
+\begin{cases}
+    w(k), &amp; \text{if } w(k) \leq M, \\
+    w(k) - 2(w(k) - M), &amp; \text{otherwise}.
+\end{cases}\]</span></p>
+<p>From here on out, we run the GA as described in the previous section.</p>
+<h1 id="reinforcement-learning">Reinforcement Learning</h1>
+<p>For every reinforcement problem, we must have the following things:</p>
+<ul>
+<li><strong>State space</strong>:
+<ul>
+<li>set of states that an agent may be in</li>
+<li>information that an agent has access to</li>
+<li>environment information, if it is changing</li>
+</ul></li>
+<li><strong>Action space</strong>:
+<ul>
+<li>set of <em>all</em> possible actions</li>
+<li>the state space may encode all <em>possible</em> actions from a given state</li>
+</ul></li>
+</ul>
+<p>(We would, in general, like to minimize the size of these spaces.)</p>
+<ul>
+<li><strong>Reward function</strong>:
+<ul>
+<li>set by the environment</li>
+<li>returns an <em>actual</em> reward for every action taken</li>
+</ul></li>
+<li><strong>Discounting</strong>:
+<ul>
+<li>subjective reward function that attempts to predict future rewards from an action</li>
+<li>Choose <span class="math inline">\(\gamma \in [0, 1)\)</span>, a measure of how much we believe our prediction.</li>
+<li>Our estimated reward at time <span class="math inline">\(t\)</span> is weighted by <span class="math inline">\(\gamma^t\)</span>.</li>
+</ul></li>
+</ul>
+<h2 id="action-selection">Action Selection</h2>
+<p>Every agent must have a way to select an action at each state. To assist in this, <span class="math inline">\(Q_{s, t}(a)\)</span> is defined as the average reward for choosing action <span class="math inline">\(a\)</span> at state <span class="math inline">\(s\)</span> after choosing it <span class="math inline">\(t\)</span> times in the past. We would like for <span class="math inline">\(Q_{s, t}(a)\)</span> to converge to the <em>actual</em> reward for the action.</p>
+<p>We can think of <span class="math inline">\(Q_{s, t}(a)\)</span> as a three dimensional table; or as the continual replacement of a two dimensional table as <span class="math inline">\(t\)</span> increases.</p>
+<p>There are various ways to choose the next action:</p>
+<ul>
+<li><p><strong>Greedy</strong>: choose the action <span class="math inline">\(a\)</span> that maximizes <span class="math inline">\(Q_{s, t}(a)\)</span>.</p></li>
+<li><p><strong><span class="math inline">\(\epsilon\)</span>-Greedy</strong>: generally choose the greedy solution, but with <span class="math inline">\(\epsilon\)</span> probability, uniformly choose a random action.</p></li>
+<li><p><strong>Softmax</strong>: Choose an action relative to the softmax probabilities; i.e. set <span class="math display">\[P(Q_{s, t}(a)) = \frac{\exp(Q_{s, t}(a) / \tau)}{\sum_{k} \exp(Q_{s, t}(k)
+  / \tau)}\]</span> and choose action <span class="math inline">\(a\)</span> relative to this probability<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>.</p></li>
+</ul>
+<p>RL problems can be split into two classes: episodic and continual. An <em>episodic</em> problem has a definite goal to be reached. A <em>continual</em> problem has no definite goal, and goes on indefinitely.</p>
+<p>Clearing up the example:</p>
+<ul>
+<li><p>The agent does <em>not</em> know the overall topography.</p></li>
+<li><p>Absorbing states have no actions to choose from.</p></li>
+</ul>
+<h2 id="values">Values</h2>
+<p>The explanation of values is a little abstruse. Roughly, values are the reward that an agent expects to get from an action at a certain state. That is, they are a &quot;subjective reward.&quot; The goal of reinforcement learning is to find a policy of choosing actions that will maximize these subjective values.</p>
+<p>This policy will be created by initializing all values to small, random numbers, then exploring the state space. As the agent explores the state space, it uses the rewards it obtains to update the values it believes each action and state should have. With any luck, the values will converge to the actual rewards.</p>
+<p>There are two different value functions:</p>
+<ul>
+<li><strong>State value function</strong>: <span class="math display">\[V(s) = E[r_t \mid s_t] = E[\sum_{k = 0}^\infty
+  \gamma^k r_{t + k + r} \mid s_t = s].\]</span>
+<ul>
+<li>Let current policy set action; average over all actions.</li>
+</ul></li>
+<li>Action-value function: <span class="math display">\[Q(s, a) = E[r_t \mid s_t, a_t] = E[\sum_{k =
+  0}^\infty \gamma^k r_{t + k + 1} \mid s_t = s, a_t = a]\]</span>
+<ul>
+<li>Let current policy select action; take the value from only those actions.</li>
+</ul></li>
+</ul>
+<p>The optimal value function <span class="math inline">\(Q^*\)</span> is given by the authors as <span class="math display">\[Q^*(s_t, a_t) =
+E[r_{t + 1}] + \gamma \max_{a_{t + 1}} Q(s_{t + 1}, a_{t + 1}).\]</span> This doesn't seem to build up to much. Later, they give an update formula <span class="math display">\[Q(s, a)
+\leftarrow Q(s, a) + \mu(r + \gamma Q(s&#39;, a&#39;) - Q(s, a)).\]</span></p>
+<h2 id="the-algorithms">The Algorithms</h2>
+<p>Q-Learning and Sarsa do roughly the same thing. The only difference is that Sarsa uses the &quot;current policy&quot; to make <em>all</em> of its decisions, where Q-Learning uses <span class="math inline">\(\epsilon\)</span>-greedy for some decisions.</p>
+<h1 id="learning-with-trees">Learning with Trees</h1>
+<p>This section corresponds to Chapter 12. Some of the code in this chapter lacks a frusterating amount of documentation.</p>
+<ul>
+<li><p>ID3 is greedy; it grabs the feature with the greatest gain at each step. When there are no features left, it grabs the most common class and hopes that it works.</p>
+<ul>
+<li><p>It's worth noting that the book requires computing the entropy of the entire dataset. We don't have to! Gain is given in Equation 12.2. When trying to maximize this, <span class="math inline">\({\operatorname{Entropy} (}S)\)</span> is constant, so the feature that has the smallest <span class="math inline">\(- \sum_{f \in values(F)}\)</span> term will maximize gain.</p>
+<p>To see this, let <span class="math inline">\(\sum_F\)</span> and <span class="math inline">\(\sum_{F&#39;}\)</span> be the sigma terms for two different features. If <span class="math display">\[\sum_F &lt; \sum_{F&#39;},\]</span> then applying the decreasing function <span class="math inline">\(f(x) = {\operatorname{Entropy} S} - x\)</span> to this inequality gives <span class="math display">\[{\operatorname{Entropy} S} - \sum_F &gt; {\operatorname{Entropy} S} - \sum_{F&#39;},\]</span> or <span class="math display">\[{\operatorname{Gain}\left( S, F \right)} &gt;
+{\operatorname{Gain}\left( S, F&#39; \right)}.\]</span></p></li>
+</ul></li>
+<li><p>The entropy of a set with classes <span class="math inline">\(C_1,\ C_2,\ \dots,\ C_n\)</span> is calculated with the probability <span class="math inline">\(p_k\)</span> being the probability of the class <span class="math inline">\(C_k\)</span> occurring in the data set. Equation 12.3 shows this with two classes: true and false.</p></li>
+<li><p><code>calc_entropy</code> does not actually compute the entropy that these sections talk about; it only <em>helps</em> compute it.</p></li>
+<li><p><code>calc_info_gain</code> does not actually compute the gain; it computes the sigma term from Equation 12.2, and <code>make_tree</code> later computes the gain. It also generalizes to an arbitrary number of classes without telling us. Here's my best guess at documentation:</p></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> calc_info_gain(data, classes, feature):
+    <span class="co">&quot;&quot;&quot;Compute the sigma term from Equation 12.2 from choosing the given feature.</span>
+
+<span class="co">    data: List of vectors [feature_1, feature_2, ..., feature_n].</span>
+<span class="co">    feature: Integer that indexes the feature to be used from the dataset.</span>
+<span class="co">    classes: List of the same length of `data`, where `classes[k]` is the class</span>
+<span class="co">             of the kth datapoint.</span>
+
+<span class="co">    The possible values will be found by looking directly at the data.</span>
+<span class="co">    &quot;&quot;&quot;</span></code></pre></div>
+<h2 id="id3-example-setup">ID3 Example Setup</h2>
+<p>Here is the setup for an ID3 example (this was the majority of a class period):</p>
+<p>Let sex denote our class, with Male and Female being values. We have the attributes Height (Tall, Medium, Short) and Weight (Heavy, Median, Light).</p>
+<p>Consider the following dataset:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Height</th>
+<th>Weight</th>
+<th>Sex</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>T</td>
+<td>H</td>
+<td>M</td>
+</tr>
+<tr class="even">
+<td>S</td>
+<td>L</td>
+<td>F</td>
+</tr>
+<tr class="odd">
+<td>M</td>
+<td>M</td>
+<td>M</td>
+</tr>
+<tr class="even">
+<td>M</td>
+<td>M</td>
+<td>M</td>
+</tr>
+<tr class="odd">
+<td>S</td>
+<td>H</td>
+<td>M</td>
+</tr>
+<tr class="even">
+<td>S</td>
+<td>L</td>
+<td>F</td>
+</tr>
+<tr class="odd">
+<td>T</td>
+<td>L</td>
+<td>F</td>
+</tr>
+<tr class="even">
+<td>T</td>
+<td>L</td>
+<td>M</td>
+</tr>
+<tr class="odd">
+<td>M</td>
+<td>L</td>
+<td>F</td>
+</tr>
+</tbody>
+</table>
+<p>From the note above, calculate the sigma term in Equation 12.2 for each Height and Weight, then split on the feature that has the smallest.</p>
+<h1 id="unsupervised-learning">Unsupervised Learning</h1>
+<p>Chapter 14 introduces us to the concept of <em>unsupervised learning</em>, or learning where an algorithm must learn to classify data without being given pre-classified examples.</p>
+<p>The biggest change from supervised to unsupervised is the lack of targets to train against. However, because there are no targets, we also can't use any of our old error functions. They rely on targets or other external information that we don't have on hand anymore. Thus, we need error functions that can operate with only a set of datapoints.</p>
+<p>As an example of how such an algorithm would work, the text introduces the <em><span class="math inline">\(K\)</span>-means algorithm</em>.</p>
+<h2 id="the-k-means-algorithm">The <span class="math inline">\(K\)</span>-Means Algorithm</h2>
+<p>The <span class="math inline">\(K\)</span>-means algorithm is roughly the unsupervised analog of the <span class="math inline">\(K\)</span>-nearest neighbors algorithm. For <span class="math inline">\(K\)</span>-nearest neighbors, an input was classified by choosing the most common class out of the <span class="math inline">\(K\)</span>-nearest examples. This idea requires that we know the class of the examples; i.e., it is a supervised algorithm. For <span class="math inline">\(K\)</span>-means, we won't have those targets to pick from.</p>
+<p>The <span class="math inline">\(K\)</span>-means algorithm operates on the same assumption as <span class="math inline">\(K\)</span>-nearest neighbors: datapoints that are close to each other are likely in the same class, and classes are usually far enough apart to be separated. The <span class="math inline">\(K\)</span>-means algorithm assumes that the data is split into <span class="math inline">\(K\)</span> classes which are separated enough to be clustered together, then tries to find the center of each cluster iteratively.</p>
+<p>The <span class="math inline">\(K\)</span>-means algorithm needs two things: a distance measure, or <a href="https://en.wikipedia.org/wiki/Metric_(mathematics)">metric</a>, and a way to compute the mean. Usually, we use the Euclidean metric, but there are others.</p>
+<p>A solid outline of the <span class="math inline">\(K\)</span>-means algorithm is given on page 283. One important thing to note is that the learning process looks at every datapoint before making any updates. This will change when we introduce neural networks to solve the problem.</p>
+<p>A final point is that the <span class="math inline">\(K\)</span>-means algorithm doesn't know anything about class labels. It can only cluster data, not say what that data is. For example, suppose that we have a dataset of flowers with the classes &quot;rose&quot; and &quot;lily.&quot; We are given a set of flowers without labels, so we try <span class="math inline">\(K\)</span>-means to cluster the examples. This gives us two clusters, but we don't know which cluster corresponds to roses, and which to lilies. Assuming that the first cluster corresponds to the first class, say &quot;rose,&quot; could be incorrect. There is not much we can do to fix this problem.</p>
+<h3 id="the-k-means-algorithm-as-a-neural-network">The <span class="math inline">\(K\)</span>-Means Algorithm as a Neural Network</h3>
+<p>We can express an <em>on-line</em> version of the <span class="math inline">\(K\)</span>-means algorithm as a neural network. On-line indicates that we will make updates to the network after seeing each datapoint, not after seeing all of them. There are various reason that we might want to do this. Perhaps we are being fed data one point at a time and need to make predictions faster than we can receive data.</p>
+<p>The neural network is a single-layer perceptron, with one input neuron for each feature in the dataset. There are <span class="math inline">\(K\)</span> output neurons representing the <span class="math inline">\(K\)</span> clusters, whose weights are the locations of the center of each cluster. The activation function used is something like the distance between two points (more on that later). To choose which output fires, hard-max is used. That is, the neuron that a point is closest to fires and gets updated. An outline of the algorithm is given on page 289.</p>
+<p>There are a few technical notes about the book's implementation: normalization and the activation function. The activation function used is <span class="math inline">\(g(\vec{x}) = \vec{x} \cdot \vec{w}\)</span>, where <span class="math inline">\(\vec{w}\)</span> is the weight vector. As the book claims, this <em>effectively</em> computes the distance between <span class="math inline">\(\vec{w}\)</span> and <span class="math inline">\(\vec{x}\)</span> under the assumption that <span class="math inline">\(\vec{w}\)</span> and <span class="math inline">\(\vec{x}\)</span> are unit vectors. What they mean by this is that, if <span class="math inline">\(\vec{x} \cdot \vec{w}\)</span> is at a maximum, then, <span class="math inline">\(|\vec{w} - \vec{x}|\)</span> is at a minimum. So we pick the output neuron that maximizes <span class="math inline">\(\vec{x} \cdot \vec{x}\)</span> using hard-max, and we know that <span class="math inline">\(\vec{x}\)</span> is closest to this neuron.</p>
+To see why this is true, we will examine <span class="math inline">\(|\vec{w} - \vec{x}|^2\)</span>. When this is minimized, then <span class="math inline">\(|\vec{w} - \vec{x}|\)</span> will also be minimized. Now,
+<span class="math display">\[\begin{align*}
+    |\vec{w} - \vec{x}|^2 &amp;= (\vec{w} - \vec{x}) \cdot (\vec{w} - \vec{x}) \\
+                          &amp;= \vec{w} \cdot \vec{w} - 2 \vec{x} \cdot \vec{w} +
+                          \vec{x} \cdot \vec{x} \\
+                          &amp;= |\vec{w}|^2 - 2 \vec{x} \cdot \vec{w} +
+                          |\vec{x}|^2.
+\end{align*}\]</span>
+<p>Since <span class="math inline">\(\vec{x}\)</span> and <span class="math inline">\(\vec{w}\)</span> are unit vectors, <span class="math inline">\(|\vec{w}|^2 = |\vec{x}|^2 = 1\)</span>, so <span class="math display">\[|\vec{w} - \vec{x}|^2 = 2 - 2 \vec{x} \cdot \vec{w},\]</span> or <span class="math display">\[\vec{x}
+\cdot \vec{w} = 1 - \frac{|\vec{w} - \vec{x}|^2}{2}.\]</span> Thus, when <span class="math inline">\(\vec{x} \cdot \vec{w}\)</span> is maximized, so is <span class="math display">\[1 - \frac{|\vec{w} - \vec{x}|^2}{2},\]</span> meaning that <span class="math display">\[\frac{|\vec{w} - \vec{x}|^2}{2}\]</span> is at a minimum, and so <span class="math inline">\(|\vec{w} - \vec{x}|^2\)</span> is as well.</p>
+<h1 id="random-number-sampling">Random Number Sampling</h1>
+<p>Sampling from a probability distribution is a key part of any algorithm with stochastic behavior. Thus, how we get those samples is important.</p>
+<h2 id="the-box-muller-scheme">The Box-Muller Scheme</h2>
+<p>Often, we want to sample from a standard normal distribution. If we can sample from a uniform distribution on <span class="math inline">\([0, 1]\)</span>, we can generate pairs of numbers from independent standard normal distributions. This is called the Box-Muller Scheme, and it's pretty simple:</p>
+<p>Given two uniformly distributed random variables <span class="math inline">\(U_1\)</span> and <span class="math inline">\(U_2\)</span> on <span class="math inline">\([0, 1]\)</span>, let <span class="math inline">\(\theta = 2\pi U_1\)</span> and <span class="math inline">\(r = \sqrt{-2 \ln(U_2)}\)</span>. Then, <span class="math inline">\(x = r\cos \theta\)</span> and <span class="math inline">\(y = r \sin \theta\)</span> are Gaussian variables with mean zero and standard deviation one.</p>
+<p>The proof of this requires a little bit of multivariate probability theory. The gist is that, for two independent, standard Gaussian variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, their product is distributed with density <span class="math display">\[f(x, y) = \frac{1}{\sqrt{2 \pi}}
+e^{-\frac{x^2}{2}} \frac{1}{\sqrt{2 \pi}} e^{-\frac{y^2}{2}} = \frac{1}{2\pi}
+e^{-\frac{x^2 + y^2}{2}}.\]</span> Next, convert to polar, i.e., set <span class="math inline">\(r^2 = x^2 + y^2\)</span> and <span class="math inline">\(\theta = \arctan(y/x)\)</span>. If we can sample <span class="math inline">\(r\)</span> and <span class="math inline">\(\theta\)</span> from a uniform distribution that maintains this relationship, then we can work in reverse to recover independent Gaussians.</p>
+<p>It works out that <span class="math inline">\(\theta\)</span> is uniformly distributed on <span class="math inline">\([0, 2\pi]\)</span>, and <span class="math inline">\(r\)</span> is on <span class="math inline">\([0, 1]\)</span>. To sample <span class="math inline">\(\theta\)</span>, we can pick <span class="math inline">\(\theta = 2\pi U_1\)</span>. To sample <span class="math inline">\(r\)</span>, we need to solve <span class="math display">\[P(r \leq R) = 1 - e^{-\frac{r^2}{2}} = 1 - U_2,\]</span> which works out to be <span class="math inline">\(r = \sqrt{-2 \ln(U_2)}\)</span>.</p>
+<h2 id="proposal-distributions">Proposal Distributions</h2>
+<p>There is an alternate method to perform the Box-Muller Scheme, which uses the idea of sampling and rejection.</p>
+<p>Let <span class="math inline">\(U_1\)</span> and <span class="math inline">\(U_2\)</span> be uniformly distributed random variables on <span class="math inline">\([-1, 1]\)</span>, and let <span class="math inline">\(w = \sqrt{U_1^2 + U_2^2}\)</span>, so that <span class="math display">\[w^2 = U_1^2 + U_2^2.\]</span> If <span class="math inline">\(w^2 &lt; 1\)</span>, i.e. the point <span class="math inline">\((U_1, U_2)\)</span> lies in the unit circle, then <span class="math display">\[x =
+U_1\sqrt{\frac{-2\ln(w^2)}{w^2}}\]</span> and <span class="math display">\[y = U_2\sqrt{\frac{-2\ln(w^2)}{w^2}}\]</span> are independent, standard Gaussian variables.</p>
+<p>This new method can be quicker, but requires that we might have to reject some points. (What's the probability that we'll have to do that?) The idea of &quot;sample-and-reject&quot; can be used to sample from arbitrary probability distributions.</p>
+<h1 id="markov-chain-monte-carlo-mcmc">Markov Chain Monte Carlo (MCMC)</h1>
+<p>Previously, we considered ways to approximate sampling from a distribution that is difficult to sample from. This included the Box-Muller Scheme (using a uniform distribution to sample from a standard normal) and the rejection sampling distribution (using an easier &quot;proposal distribution&quot; to approximate samples). In this section, we look at using Markov chains to accomplish the same thing.</p>
+<h2 id="markov-chains">Markov Chains</h2>
+<p>A Markov Chain is a sequence of states where the probability of being in the next state depends only on the current state. For examples, think of the standard &quot;random walk&quot; or &quot;Brownian motion&quot; in probability.</p>
+<p>The text does not make use of a lot of Markov chain theory, but it does place a lot of technical restrictions on the chains. In particular, it requires that the chains are strongly ergodic. This means that they are irreducible, positive recurrent, and aperiodic. This doesn't ever make a big appearance in the section, but it is quite easy to create a non-ergodic Markov chain. If ergodicity is actually important, we should be careful when just playing with Markov Chains.</p>
+<h2 id="markov-chains-and-sampling">Markov Chains and Sampling</h2>
+<p>Some Markov chains have <em>limiting distributions</em>. These are analogous to stable equilibrium points in differential equations. For a limiting distribution, no matter what state we begin in, after a large number of steps, the probability of our end position will be described by a constant distribution. Formally, if <span class="math inline">\(p^{(n)}_{ij}\)</span> is the probability of being in state <span class="math inline">\(i\)</span> after <span class="math inline">\(n\)</span> steps from state <span class="math inline">\(j\)</span>, then <span class="math display">\[\lim_{n \to \infty} p^{(n)}_{ij} = \pi_i,\]</span> where <span class="math inline">\(\pi_i\)</span> is a constant. Because we require that our Markov chains be strongly ergodic, each of them has a unique limiting distribution. (Take my word for it.)</p>
+<p>Markov chains are very simple to sample from. Start at any state and take a large number of random steps. The end state is our sampled value. If we can create an ergodic Markov chain whose limiting distribution is the distribution we want to sample from, then we can approximate samples from that distribution. For example, if our Markov chain had a Poisson limiting distribution, then the end state after a large number of random walks would approximately be a random value from a Poisson distribution<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>.</p>
+<p>To generalize the idea of sampling, we have a proposal distribution <span class="math inline">\(q(x_i \mid x_i)\)</span>. That is, a distribution whose next sample depends only on the current sample. This is sort of a &quot;generalized&quot; Markov chain. We start with an initial guess and then we take another sample from this proposal distribution. We take this new sample only if it is roughly &quot;more likely&quot; than the current sample. This is done by computing an &quot;acceptance ratio&quot; and accepting the point with probability equal to this acceptance ratio.</p>
+<p>The algorithm runs as follows:</p>
+<p><strong>Metropolis-Hastings Algorithm:</strong></p>
+<ol style="list-style-type: decimal">
+<li><p>Decide to sample <span class="math inline">\(n\)</span> values and pick an initial sample <span class="math inline">\(x_0\)</span>.</p></li>
+<li><p>Set <span class="math inline">\(k = 0\)</span>.</p></li>
+<li><p>Loop until <span class="math inline">\(k = n\)</span>:</p>
+<ol style="list-style-type: lower-roman">
+<li><p>Sample a new value <span class="math inline">\(x^*\)</span> from the proposal distribution.</p></li>
+<li><p>Compute the acceptance ratio <span class="math display">\[\alpha = \min \left(1, \frac{p(x^*)
+q(x^* \mid x_k)}{p(x_k) q(x_k \mid x^*)} \right).\]</span></p>
+<ul>
+<li>Note that <span class="math inline">\(\alpha\)</span> increases if <span class="math inline">\(q\)</span> says that moving to <span class="math inline">\(x^*\)</span> from <span class="math inline">\(x_k\)</span> is more likely than moving the opposite direction the current sample. It also increases if <span class="math inline">\(p\)</span> says that <span class="math inline">\(x^*\)</span> is more likely than <span class="math inline">\(x_k\)</span> in general.</li>
+</ul></li>
+<li><p>Pick a uniform number <span class="math inline">\(u\)</span> from <span class="math inline">\([0, 1]\)</span>.</p></li>
+<li><p>If <span class="math inline">\(u &lt; \alpha\)</span>, then set <span class="math inline">\(x_{k + 1} = x^*\)</span> and <span class="math inline">\(k \leftarrow k + 1\)</span>. Otherwise, repeat.</p></li>
+</ol></li>
+<li><p>Celebrate with your <span class="math inline">\(n\)</span> samples.</p></li>
+</ol>
+<h1 id="gaussian-process-regression">Gaussian Process Regression</h1>
+<p>When given a dataset to perform regression on, we must choose what model to use. Is the data linear? Exponential? Or maybe something really weird, like sinusoidal? Generally, to pick the best model, we go through a trial-and-error process. The goal behind Gaussian Processes is to generalize this trial-and-error process by selecting different types of models from a probability distribution.</p>
+<h2 id="gaussian-processes">Gaussian Processes</h2>
+<p>A stochastic process is a collection of random variables. For example, the function <span class="math inline">\(f(x) = \exp(-ax)\)</span>, where <span class="math inline">\(a\)</span> is sampled from a standard normal distribution, can be thought of as a stochastic process. For each sampled value of <span class="math inline">\(a\)</span>, we obtain a new distribution <span class="math inline">\(f(x)\)</span>. (This is shown in Figure 18.3.)</p>
+<p>A <em>Gaussian process</em> (GP) is a stochastic process where each variable has a Gaussian distribution, and joining any finite number of them results in another Gaussian distribution. For example, the stochastic process <span class="math inline">\(f(x)\)</span> above is a Gaussian process<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a>.</p>
+<p>A regular Gaussian distribution is determined by a mean and covariance matrix. Likewise, a Gaussian process is determined by mean and covariance <em>functions</em>. That is, a function that describes the mean and covariance matrix of each random variable. It turns out that any function that is a <em>kernel</em> from SVMs will do as a covariance function. A common covariance function is the RBF kernel, <span class="math display">\[k(\vec{x}, \vec{y}) = \sigma_f^2 \exp\left( -\frac{|x - y|^2}{2l^2}
+\right),\]</span> where <span class="math inline">\(\sigma_f\)</span> and <span class="math inline">\(l\)</span> are positive parameters.</p>
+<h2 id="performing-regression">Performing Regression</h2>
+<p>In the context of regression, we make the assumption that sampling is a Gaussian Process. That is, each datapoint comes from a normal distribution and any collection of datapoints is also from a normal distribution. This will allow us to predict the value of a testpoint using the mean of a created normal distribution.</p>
+<p>First, for any set of examples, we subtract off the mean so that everything has mean zero. This means that we can ignore the mean function. This gives us a set of points <span class="math inline">\((\vec{x_k}, t_k)\)</span>. Next, we choose some covariance function <span class="math inline">\(k(\vec{x}, \vec{y})\)</span>. From this, we build the covariance matrix for the normal distribution of the dataset. It is defined by <span class="math display">\[K_{ij} = k(\vec{x}_i,
+\vec{x}_j).\]</span></p>
+<p>At this point, we are ready to perform regression on a test point <span class="math inline">\(\vec{x^*}\)</span>. Because we assumed that sampling is a Gaussian process, the test point <span class="math inline">\(\vec{x^*}\)</span> with the dataset are normally distributed. This new distribution has the covariance matrix (obtained by appending a row and column to <span class="math inline">\(K\)</span>) <span class="math display">\[
+K_{\vec{x}^*} =
+\begin{bmatrix}
+    K &amp; \vec{k}^* \\
+    \vec{k}^{*T} &amp; k^{**}
+\end{bmatrix},
+\]</span> where <span class="math inline">\(K\)</span> is the covariance matrix of the dataset, <span class="math inline">\(\vec{k}^*\)</span> is the vector of covariances <span class="math inline">\(k(\vec{x}^*, \vec{x})\)</span>, and <span class="math inline">\(k^{**} = k(\vec{x}^*, \vec{x}^*)\)</span>.</p>
+<p><a href="https://www.robots.ox.ac.uk/~mebden/reports/GPtutorial.pdf">It works out that</a> the probability that <span class="math inline">\(\vec{x^*}\)</span> should have value <span class="math inline">\(y^*\)</span> given the dataset, i.e. <span class="math display">\[P(y^* \mid (\vec{x}_1, t_1), (\vec{x}_2, t_2), \dots, (\vec{x}_n,
+t_n))\]</span> follows the normal distribution <span class="math display">\[N(\mu = \vec{k}^* K^{-1}\vec{t},
+\sigma^2 = k^{**} - \vec{k}^* K^{-1} \vec{t}),\]</span> where <span class="math inline">\(\vec{t} = [t_1, t_2, \dots, t_n]\)</span>. To predict the value that <span class="math inline">\(\vec{x}^*\)</span> should have, we simply take the mean of this distribution.</p>
+<h2 id="algorithm-sketch">Algorithm Sketch</h2>
+<ul>
+<li><p>Pick a covariance function <span class="math inline">\(k(\vec{x}, \vec{y})\)</span>, and create the dataset <span class="math inline">\((\vec{x}_k, t_k)\)</span> with mean zero.</p></li>
+<li><p>Compute the covariance matrix <span class="math inline">\(K_{ij} = k(\vec{x}_i, \vec{x}_j)\)</span>.</p></li>
+<li>For each testpoint <span class="math inline">\(\vec{x}^*\)</span>:
+<ul>
+<li>Compute the &quot;covariance vector&quot; <span class="math inline">\(\vec{k^*}\)</span>.</li>
+<li>Compute the covariance <span class="math inline">\(k^{**} = k(\vec{x}^*, \vec{x}^*)\)</span>.</li>
+<li>Predict <span class="math inline">\(y^* = \vec{k}^{*T} K^{-1} \vec{t}\)</span>.</li>
+</ul></li>
+</ul>
+<h1 id="bayesian-networks">Bayesian Networks</h1>
+<h2 id="computational-examples">Computational Examples</h2>
+<p>Dataset:</p>
+<table>
+<thead>
+<tr class="header">
+<th>A</th>
+<th>B</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>T</td>
+<td>F</td>
+<td>T</td>
+</tr>
+<tr class="even">
+<td>T</td>
+<td>T</td>
+<td>F</td>
+</tr>
+<tr class="odd">
+<td>T</td>
+<td>F</td>
+<td>T</td>
+</tr>
+<tr class="even">
+<td>F</td>
+<td>T</td>
+<td>T</td>
+</tr>
+<tr class="odd">
+<td>F</td>
+<td>T</td>
+<td>T</td>
+</tr>
+<tr class="even">
+<td>F</td>
+<td>F</td>
+<td>T</td>
+</tr>
+<tr class="odd">
+<td>F</td>
+<td>F</td>
+<td>F</td>
+</tr>
+<tr class="even">
+<td>F</td>
+<td>F</td>
+<td>T</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math inline">\(P(A = T) = \frac{3}{8}\)</span></p>
+<p><span class="math inline">\(P(B = T) = \frac{3}{8}\)</span></p>
+<p><span class="math inline">\(P(A = T \mid B = T) = \frac{1}{3}\)</span></p>
+<p><span class="math inline">\(P(B = T \mid A = T) = \frac{1}{3}\)</span></p>
+<p>The variables <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span> are dependent since <span class="math inline">\(P(A = T \mid B = T) \neq P(A = T)\)</span>. That is, knowing that <span class="math inline">\(B\)</span> occurs affects the probability of <span class="math inline">\(A\)</span> occuring.</p>
+<p>The goal is, given a dataset, to create a Bayesian network describing the dependency relations.</p>
+<h2 id="score-based-approach">Score-Based Approach</h2>
+<p>This is very similar to genetic algorithms.</p>
+<ol style="list-style-type: decimal">
+<li><p>Generate and/or modify Bayesian networks.</p></li>
+<li><p>Evaluate quality of networks using some &quot;score&quot; metric.</p></li>
+<li><p>Repeat steps 1 and 2 with variations on the &quot;best&quot; network.</p></li>
+</ol>
+<h3 id="minimum-description-length-mdl">Minimum Description Length (MDL)</h3>
+<p>This is one possible way to score a network.</p>
+<p>Suppose that we have <span class="math inline">\(M\)</span> datapoints on a graph <span class="math inline">\(G\)</span> with <span class="math inline">\(N\)</span> attributes. Then, the MDL is defined as <span class="math display">\[L(G) = \frac{1}{M} \log \prod_{k = 1}^M P(D_{k} \mid G)
+= \frac{1}{M} \sum_{j = 1}^N \sum_{k = 1}^M \log(P(X_j = d_{kj} \mid C(X_j)),\]</span> where <span class="math inline">\(X_j\)</span> is the <span class="math inline">\(j\)</span>th variable, <span class="math inline">\(d_{kj}\)</span> is the <span class="math inline">\(j\)</span>th attribute of the <span class="math inline">\(k\)</span>th datapoint <span class="math inline">\(C(X_j)\)</span> is the conditioning set of <span class="math inline">\(X_j\)</span>, or the set of parents of <span class="math inline">\(X_j\)</span>.</p>
+For example (because we desperately need one), consider the dataset from above, with the graph <span class="math inline">\(G\)</span> described by <span class="math inline">\(A \to C\)</span> and <span class="math inline">\(B \to C\)</span>. Then,
+<span class="math display">\[\begin{align*}
+    L(G) &amp;= \frac{1}{8} \sum_{k = 1}^8 \sum_{j = 1}^3 \log P(X_k \mid C(X_k)) \\
+         &amp;= \frac{1}{8} [3\log P(A = T) + 5 \log P(A = F) + \dots]
+\end{align*}\]</span>
+<h2 id="independence-tests">Independence Tests</h2>
+<p>Formally, two variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent iff <span class="math inline">\(P(X \mid Y) = P(X)\)</span>. When sampling values of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span>, we may never be sure if they are <em>actually</em> independent, since we will never have the full picture. Patterson introduced us to the <span class="math inline">\(\chi^2\)</span> (chi-squared) test for independence.</p>
+<p>Null hypothesis (<span class="math inline">\(H_0\)</span>): the variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent given <span class="math inline">\(Z\)</span>.</p>
+<p><span class="math inline">\(\chi^2\)</span> statistic: square of actual minus expected, divided by expected. (?)</p>
+<p>Example: Suppose that 100 people took a course. Of those, 50 passed the course. Of the original 100, 50 passed the first exam, and only 25 of those that passed the exam passed the course. Is passing the course independent of the first exam?</p>
+<p>However (and I quote), of 50 passing the first exam, 35 passed the course. Are they independent? (What?)</p>
+<p><span class="math display">\[\chi^2 = \frac{(35 - 25)^2}{25} = \frac{100}{25} = 4.\]</span> Roughly, this means that this is unlikely.</p>
+<h2 id="pc-algorithm">PC Algorithm</h2>
+<ol style="list-style-type: decimal">
+<li><p>Begin with a complete, undirected graph.</p></li>
+<li><p>(Remove direct indepencies.) For all pairs of variables <span class="math inline">\((X, Y)\)</span>, if <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent under some independence test, remove the <span class="math inline">\(X \to Y\)</span> edge.</p></li>
+<li><p>(Remove indirect independencies.) For all pairs <span class="math inline">\((X, Y)\)</span>, and for all <span class="math inline">\(Z\)</span> that are adjacent to <span class="math inline">\(X\)</span> <em>or</em> <span class="math inline">\(Y\)</span>, if <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent given <span class="math inline">\(Z\)</span> under some independence test, remove the <span class="math inline">\(X \to Z\)</span> edge.</p></li>
+<li><p>Repeat step 3 for all sets <span class="math inline">\(Z\)</span> of size 2, 3, ..., until out of sets. That is, check if <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent given <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Z_2\)</span> for all adjacent <span class="math inline">\(Z_1\)</span> and <span class="math inline">\(Z_2\)</span>, and so on, for all sizes of the set <span class="math inline">\(Z\)</span>.</p></li>
+<li><p>We now have an undirected skeleton. If <span class="math inline">\((X, Y)\)</span> are <em>both</em> adjacent to <span class="math inline">\(Z\)</span>, then check if <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are independent given <span class="math inline">\(Z\)</span>. If they are dependent, then orient edges as <span class="math inline">\(X \to Z \leftarrow Y\)</span>.</p></li>
+<li><p>Repeat step 5 until all pairs are tested.</p></li>
+<li><p>If <span class="math inline">\(A \to B\)</span>, <span class="math inline">\(B --- C\)</span>, the pair <span class="math inline">\((A, C)\)</span> is not adjacent, and <span class="math inline">\(C \not\to B\)</span>, then set <span class="math inline">\(B \to C\)</span>.</p></li>
+<li><p>If <span class="math inline">\(A --- B\)</span> and there's a <em>directed</em> path from <span class="math inline">\(A\)</span> to <span class="math inline">\(B\)</span>, then set <span class="math inline">\(A \to B\)</span>.</p></li>
+<li><p>Repeat steps 7, 8 until there is no change. Orient remaining edges randomly.</p></li>
+</ol>
+<h2 id="hidden-markov-models">Hidden Markov Models</h2>
+<h3 id="forward-algorithm">Forward Algorithm</h3>
+<p>Goal: Estimate <span class="math inline">\(P(\text{state})\)</span> given a set of observations and the current model.</p>
+<p>Using the Law of Total Probability, <span class="math display">\[P(O) = \sum_{r = 1}^R P(O \mid \Omega_r)
+P(\Omega_r),\]</span> where <span class="math inline">\(\Omega_r\)</span> is a possible sequence of states. Since <span class="math inline">\(\Omega_r\)</span> represents a sequence of states, we will assume that <span class="math display">\[P(\Omega_r) =
+\prod_{t = 1}^T a_{\Omega_{r, t} \Omega_{r, t + 1}},\]</span> where <span class="math inline">\(T\)</span> is the number of states in each <span class="math inline">\(\Omega_r\)</span> and <span class="math inline">\(a_{ij}\)</span> are the transition probabilities of the Markov chain. We will also assume that <span class="math display">\[P(O \mid \Omega_r) = \prod_{t =
+1}^T b_{\Omega_{r, t}} (O_k),\]</span> where <span class="math inline">\(b_{i}(o)\)</span> is the probability of emitting observation <span class="math inline">\(o\)</span> given that we were in state <span class="math inline">\(i\)</span>. Thus, <span class="math display">\[P(O) = \sum_{r = 1}^R
+\prod_{t = 1}^T b_{\Omega_{r, t}}(O_t) a_{\Omega_{r, t} \Omega_{r, t + 1}}.\]</span></p>
+<p>Runtime: <span class="math inline">\(O(T N^T)\)</span>.</p>
+<p>Forward Trellis: <span class="math inline">\(R\)</span> and <span class="math inline">\(T\)</span> are usually <em>really</em> big, and that means that <span class="math inline">\(O(T N^T)\)</span> is hard. The &quot;forward trellis&quot; avoids this by focusing only the the observations seen and the most likely steps. This gets us down to <span class="math inline">\(O(T N^2)\)</span>.</p>
+<h3 id="baum-welch-foward-backward-algorithm">Baum-Welch (Foward-Backward) Algorithm</h3>
+<p>Goal: Learn transition and observation probabilities.</p>
+<p>Issues:</p>
+<ul>
+<li><p>Unsupervised learning.</p></li>
+<li><p>NP-Complete (almost certainly exponential)</p></li>
+</ul>
+<p>Variables:</p>
+<ul>
+<li><p><span class="math inline">\(\beta_i(t) =\)</span> probability that we are in state <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>.</p></li>
+<li><p><span class="math inline">\(\pi_i =\)</span> probability of state <span class="math inline">\(i\)</span> in the initial distribution.</p></li>
+<li><p><span class="math inline">\(a_{ij} =\)</span> probability of moving from state <span class="math inline">\(i\)</span> to state <span class="math inline">\(j\)</span>.</p></li>
+<li><p><span class="math inline">\(b_i(o_k) =\)</span> probability of observing <span class="math inline">\(o_k\)</span> after being in state <span class="math inline">\(i\)</span>.</p></li>
+</ul>
+<p>See page 340 for actual definitions.</p>
+<p>Algorithm:</p>
+<ul>
+<li><p>Initialize <span class="math inline">\(\pi\)</span> to uniform distribution and <span class="math inline">\(a_{ij}\)</span>, <span class="math inline">\(b_i(o_k)\)</span> to be random probabilities.</p></li>
+<li><p>While the algorithm has not converged:</p>
+<ol style="list-style-type: decimal">
+<li><p>E-step: calculate <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>. For each <span class="math inline">\(o_t\)</span>, <span class="math inline">\(i\)</span>, <span class="math inline">\(j\)</span>, compute <span class="math inline">\(\xi_{i, j, k}\)</span>.</p></li>
+<li><p>M-step:</p></li>
+</ol></li>
+</ul>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>This is bunk. -- Dr. Patterson<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>He says, using proof by intimidation.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Decision trees, Chapter 12, are referred to in the past tense in this chapter, Chapter 7.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>Because I don't understand it.<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Mercer's Theorem is a result in functional analysis. We will not talk about it or functional analysis ever again.<a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>See <a href="this%20Math.SE%20answer">http://math.stackexchange.com/a/453421/261157</a>. The rough sketch is that, for a point <span class="math inline">\(\vec{x}\)</span> to be a local minimum for <span class="math inline">\(f\)</span> constrained by each <span class="math inline">\(g_k\)</span>, then <span class="math inline">\(\nabla f(\vec{x})\)</span> must belong to the vector space spanned by each <span class="math inline">\(\nabla g_k\)</span>. Or, <span class="math inline">\(\nabla f(\vec{x}) = \sum_{k = 1}^n \lambda_k \nabla g_k(\vec{x})\)</span>, as stated.<a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>Which I am not clear on at all.<a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>This doesn't make much sense. This is negative only if &quot;predicted&quot; is negative, which doesn't mean anything about the relative magnitude of errors. It is difficult to parse the author's implementation, since they apply <code>np.linalg.norm</code>, which I believe makes everything positive, then makes the same positive/negative check.<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>That is, pick a random number <span class="math inline">\(r\)</span>. If <span class="math inline">\(r\)</span> is less <span class="math inline">\(P(Q_{s, t}(1)\)</span>, then choose action 1. If <span class="math inline">\(r\)</span> is larger than it, then examine the second action. And so on until the last action is reached.<a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p>It will not do to simply select a state at random. This would be sampling from a uniform distribution. The walks have to actually be performed, since that's what the limiting distribution requires.<a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>I think.<a href="#fnref11">↩</a></p></li>
+</ol>
+</div>
+</body>
+</html>
